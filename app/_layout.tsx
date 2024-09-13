@@ -14,7 +14,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    Inter: require('../assets/fonts/Inter_28pt-Light.ttf')
+    Inter: require('../assets/fonts/Inter_28pt-Light.ttf'),
   });
 
   useEffect(() => {
@@ -29,9 +29,9 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+        <Stack.Screen name="explore" options={{animation: "fade"}} />
       </Stack>
     </ThemeProvider>
   );
