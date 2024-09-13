@@ -14,7 +14,7 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-    
+    Inter: require('../assets/fonts/Inter_28pt-Light.ttf')
   });
 
   useEffect(() => {
