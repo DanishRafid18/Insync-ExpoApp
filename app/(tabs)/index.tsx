@@ -8,27 +8,30 @@ import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 export default function HomeScreen() {
   return (
-    <SafeAreaView style={{backgroundColor: '#5081FF'}}>
-      <StatusBar
-        backgroundColor="#5081FF"
+    <SafeAreaView style={{ flex: 1, backgroundColor: '#5081FF' }}>
+  <StatusBar backgroundColor="#5081FF" />
+  <View style={{ flex: 1, backgroundColor: '#5081FF' }}>
+    <View style={{ alignItems: 'center', marginTop: 50 }}>
+      <Image
+        source={require('@/assets/images/WhiteTransparentLogo.png')}
+        resizeMode="contain"
+        style={{ width: 300, height: 300 }}
       />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={{backgroundColor: '#5081FF'}}
-        contentContainerStyle = {{ height: '100%'}}
-        >
-        <View
-          style={{backgroundColor: '#5081FF'}}>
-          <Image source = {require('@/assets/images/WhiteTransparentLogo.png')}
-            resizeMode='contain'
-            style={{width: 300, height: 300, marginTop: 50, margin: 'auto'}}
-            />
-            <View style={{marginTop: 120}}>
-            <Text style={{fontSize:20, color: "#ffffff", textAlign:"center", fontFamily: 'Inter'}}>Press anywhere to start</Text>
-            </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    </View>
+    <View style={{ flex: 1, justifyContent: 'flex-end', marginBottom: 50 }}>
+      <Text
+        style={{
+          fontSize: 20,
+          color: '#ffffff',
+          textAlign: 'center',
+          fontFamily: 'Inter',
+        }}
+      >
+        Press anywhere to start
+      </Text>
+    </View>
+  </View>
+</SafeAreaView>
   );
 }
 
