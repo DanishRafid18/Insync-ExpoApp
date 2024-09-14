@@ -18,7 +18,7 @@ export default function IndexScreen() {
       <Pressable
         style={{ flex: 1 }}
         onPress={() => {
-          router.replace('/explore');
+          router.replace('/Login');
         }}
       >
         <View style={{ flex: 1, backgroundColor: '#5081FF' }}>
