@@ -14,7 +14,7 @@ import { useRouter } from 'expo-router';
 import { BlueTitleText } from '@/components/BlueTitleText';
 
 
-export default function LoginScreen(){
+export default function SignUpScreen(){
     const router = useRouter();
     const colorScheme = useColorScheme();
 
@@ -24,14 +24,9 @@ export default function LoginScreen(){
     return (
       <SafeAreaView style={{ flex: 1}}>
         <View style= {{ width: 325, alignSelf: 'center', marginTop: 100 }}>
-            <BlueTitleText>
-                Login
+            <BlueTitleText style = {{width:500, fontSize: 40, marginBottom: 30}}>
+                Create Account
             </BlueTitleText>
-
-            <Text style={{color: TextColor, fontFamily: 'DMSansBold', fontSize: 17, marginBottom: 20}}>
-              Please sign in to continue
-            </Text>
-
             <TextInput 
             style = 
                 {{
@@ -44,7 +39,7 @@ export default function LoginScreen(){
                     color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
                     marginBottom: 20
                 }}
-            placeholder='Username'
+            placeholder='Full Name'
             placeholderTextColor={TextColor}
             >
             </TextInput>
@@ -57,39 +52,55 @@ export default function LoginScreen(){
                     borderRadius:5, 
                     height: 50,
                     padding: 10,
-                    color: colorScheme === 'dark' ? '#FFFFFF' : '#000000'
-                    
+                    color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+                    marginBottom: 20
+                }}
+            placeholder='Email'
+            placeholderTextColor={TextColor}
+            >
+            </TextInput>
+            <TextInput 
+            style = 
+                {{
+                    backgroundColor: TextFieldColor, 
+                    borderWidth: 1, 
+                    borderColor:"#5081FF", 
+                    borderRadius:5, 
+                    height: 50,
+                    padding: 10,
+                    color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+                    marginBottom: 20
                 }}
             placeholder='Password'
             placeholderTextColor={TextColor}
             >
             </TextInput>
+            <TextInput 
+            style = 
+                {{
+                    backgroundColor: TextFieldColor, 
+                    borderWidth: 1, 
+                    borderColor:"#5081FF", 
+                    borderRadius:5, 
+                    height: 50,
+                    padding: 10,
+                    color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+                    marginBottom: 20
+                }}
+            placeholder='Confirm Password'
+            placeholderTextColor={TextColor}
+            >
+            </TextInput>
             <Pressable style = {({pressed}) => [
                   { //pressed code from https://reactnative.dev/docs/pressable under
-                    backgroundColor: pressed ? 'rgb(210, 230, 255)' :  "#5081FF",  padding: 10, borderRadius: 5, marginLeft: "65%", marginTop: 20
+                    backgroundColor: pressed ? 'rgb(210, 230, 255)' :  "#5081FF",  width: 125, height: 60, padding:12,  borderRadius: 5, marginLeft: "65%", marginTop: 20
                   }
                 ]}>
               <Text style={{textAlign:'center', fontFamily: "DMSansBold", color: "#FFFFFF", fontSize: 25,}} >
-                LOGIN
+                SIGN UP
               </Text>
             </Pressable>
         </View>
-        
-        <View style={{flexDirection:'row', alignSelf: 'center', position:"absolute", bottom: 0, marginBottom: "20%"}}>       
-          <Text style = {{marginRight: 10, color: colorScheme === 'dark' ? '#FFFFFF' : '#000000'}}> 
-            Don't have an account? 
-          </Text>
-          <Pressable onPress={() => {
-          router.push('/SignUp');
-        }}>
-            {({pressed}) => (
-              <Text style={{fontFamily:'DMSansBold',color: pressed ? "#88a9fc" : "#5081FF" }}>
-                {pressed ? 'Sign Up' : 'Sign Up'}
-                </Text>
-            )}
-          </Pressable>
-        </View>  
-
       </SafeAreaView>
     );
 }

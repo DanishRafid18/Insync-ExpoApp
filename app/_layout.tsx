@@ -71,7 +71,8 @@ export default function RootLayout() {
         >
         <Stack.Screen name="index" options={{headerShown: false}} />
         <Stack.Screen name="explore" options={{animation: "fade_from_bottom", }} />
-        <Stack.Screen name="Login" options={{animation: "fade_from_bottom", }} />
+        <Stack.Screen name="Login" options={{animation: "fade", }} />
+        <Stack.Screen name="SignUp" />
       </Stack>
     </ThemeProvider>
   );
