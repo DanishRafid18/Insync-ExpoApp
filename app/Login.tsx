@@ -69,7 +69,7 @@ export default function LoginScreen(){
                     backgroundColor: pressed ? 'rgb(210, 230, 255)' :  "#5081FF",  padding: 10, borderRadius: 5, marginLeft: "65%", marginTop: 20
                   }
                 ]}>
-              <Text style={{textAlign:'center', fontFamily: "DMSansBold", color: "#FFFFFF", fontSize: 25,}} >
+              <Text style={{textAlign:'center', fontFamily: "DMSansBold", color: "#FFFFFF", fontSize: 20,}} >
                 LOGIN
               </Text>
             </Pressable>
@@ -80,6 +80,7 @@ export default function LoginScreen(){
             Don't have an account? 
           </Text>
           <Pressable onPress={() => {
+            
           router.push('/SignUp');
         }}>
             {({pressed}) => (

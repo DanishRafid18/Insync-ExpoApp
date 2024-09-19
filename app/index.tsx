@@ -22,7 +22,7 @@ export default function IndexScreen() {
         }}
       >
         <View style={{ flex: 1, backgroundColor: '#5081FF' }}>
-          <View style={{ alignItems: 'center', marginTop: 50 }}>
+          <View style={{ alignItems: 'center', marginTop: "50%" }}>
             <Image
               source={require('@/assets/images/WhiteTransparentLogo.png')}
               resizeMode="contain"

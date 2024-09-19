@@ -93,10 +93,10 @@ export default function SignUpScreen(){
             </TextInput>
             <Pressable style = {({pressed}) => [
                   { //pressed code from https://reactnative.dev/docs/pressable under
-                    backgroundColor: pressed ? 'rgb(210, 230, 255)' :  "#5081FF",  width: 125, height: 60, padding:12,  borderRadius: 5, marginLeft: "65%", marginTop: 20
+                    backgroundColor: pressed ? 'rgb(210, 230, 255)' :  "#5081FF",  padding: 10, borderRadius: 5, marginLeft: "65%", marginTop: 20
                   }
                 ]}>
-              <Text style={{textAlign:'center', fontFamily: "DMSansBold", color: "#FFFFFF", fontSize: 25,}} >
+              <Text style={{textAlign:'center', fontFamily: "DMSansBold", color: "#FFFFFF", fontSize: 20,}} >
                 SIGN UP
               </Text>
             </Pressable>
