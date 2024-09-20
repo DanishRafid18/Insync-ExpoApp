@@ -2,7 +2,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, } from 'react';
+import React, { useEffect, } from 'react';
 import 'react-native-reanimated';
 
 import {
@@ -12,8 +12,10 @@ import {
   Image,
   Text,
   Pressable,
+  Button,
 } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import DefaultHeader from './DefaultHeader';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -49,31 +51,38 @@ export default function RootLayout() {
   const headerTintColor = colorScheme === 'dark' ? '#FFFFFF' : '#000000';
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? MyDarkTheme : MyLightTheme}>
-      <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: headerBackgroundColor,
-          },
-          headerTintColor: headerTintColor,
-          headerTitleStyle: { fontWeight: 'bold', color: headerTintColor },
-          headerLeft: () => (
-            <Image
-              source={headerLogo}
-              resizeMode="contain"
-              style={{ width: 100, height: 40, marginLeft: 0}}
-            />
-          ),
-          headerTitle:'',
-          headerShadowVisible: false,
-                
-        }}
-        >
-        <Stack.Screen name="index" options={{headerShown: false}} />
-        <Stack.Screen name="explore" options={{animation: "fade_from_bottom", }} />
-        <Stack.Screen name="Login" options={{animation: "fade", }} />
-        <Stack.Screen name="SignUp" />
-      </Stack>
-    </ThemeProvider>
+<ThemeProvider value={colorScheme === 'dark' ? MyDarkTheme : MyLightTheme}>
+  <Stack
+    screenOptions={{
+      headerStyle: {
+        backgroundColor: headerBackgroundColor,
+      },
+      headerTintColor: headerTintColor,
+      headerTitleStyle: { fontWeight: 'bold', color: headerTintColor },
+      headerLeft: () => (
+        <Image
+          source={headerLogo}
+          resizeMode="contain"
+          style={{ width: 100, height: 40, marginLeft: 0 }}
+        />
+      ),
+      headerTitle: '',
+      headerShadowVisible: false,
+    }}
+  >
+    <Stack.Screen name="index" options={{ headerShown: false }} />
+    <Stack.Screen name="explore" options={{ animation: 'fade_from_bottom' }} />
+    <Stack.Screen name="Login" options={{ animation: 'fade' }} />
+    <Stack.Screen name="SignUp" />
+    <Stack.Screen
+      name="Homepage"
+      options={{
+        header: () => <DefaultHeader />,
+        
+      }}
+    />
+  </Stack>
+</ThemeProvider>
+
   );
 }
