@@ -9,14 +9,9 @@ const Background = () => {
   const headerHeight = screenHeight * 0.15;
   const colorScheme = useColorScheme();
   const MenuIcon = colorScheme === 'dark' ? require('@/assets/images/MenuBlack.png') : require('@/assets/images/MenuWhite.png');
-
-  const openDrawer = () =>{
-    navigation.dispatch(DrawerActions.toggleDrawer)
-  }
-
   return (
     <View style={[styles.headerContainer, { height: headerHeight, borderBottomLeftRadius: 10, borderBottomRightRadius: 10,}]}>
-
+      
     </View>
   );
 };
