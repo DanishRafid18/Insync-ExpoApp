@@ -10,13 +10,15 @@ import {
   useColorScheme,
   StyleSheet
 } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { Href, Stack, useRouter } from 'expo-router';
 import { BlueTitleText } from '@/components/BlueTitleText';
+import { useNavigation } from '@react-navigation/native';
 
 
 export default function LoginScreen(){
     const router = useRouter();
     const colorScheme = useColorScheme();
+    const navigation = useNavigation();
 
     const TextFieldColor = colorScheme === 'dark' ? '#2c2c2c' : '#FFFFFF';
     const TextColor = colorScheme === 'dark' ? '#dce1e8' : '#B3B9C2';
@@ -24,6 +26,7 @@ export default function LoginScreen(){
     const headerBackgroundColor = colorScheme === 'dark' ? '#2c2c2c' : '#FFFFFF';
     const headerLogo = colorScheme === 'dark' ? require('@/assets/images/WhiteTransparentLogo.png') : require('@/assets/images/BlackTransparentLogo.png');
     const headerTintColor = colorScheme === 'dark' ? '#FFFFFF' : '#000000';
+
 
     return (
       <SafeAreaView style={{ flex: 1}}>
@@ -71,8 +74,8 @@ export default function LoginScreen(){
             </TextInput>
             <Pressable onPress={() => {
             
-              router.replace('/Homepage');
-            }}
+            router.replace('./drawer/Homepage');
+          }}
             style = {({pressed}) => [
                   { //pressed code from https://reactnative.dev/docs/pressable under
                     backgroundColor: pressed ? 'rgb(210, 230, 255)' :  "#5081FF",  padding: 10, borderRadius: 5, marginLeft: "65%", marginTop: 20
@@ -86,11 +89,11 @@ export default function LoginScreen(){
         
         <View style={{flexDirection:'row', alignSelf: 'center', position:"absolute", bottom: 0, marginBottom: "20%"}}>       
           <Text style = {{marginRight: 10, color: colorScheme === 'dark' ? '#FFFFFF' : '#000000'}}> 
-            Don't have an account? 
+            Don't have an account?
           </Text>
           <Pressable onPress={() => {
             
-          router.push('/SignUp');
+          router.replace('/SignUp');
         }}>
             {({pressed}) => (
               <Text style={{fontFamily:'DMSansBold',color: pressed ? "#88a9fc" : "#5081FF" }}>

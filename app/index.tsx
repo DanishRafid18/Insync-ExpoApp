@@ -7,11 +7,12 @@ import {
   Text,
   Pressable,
 } from 'react-native';
-import { useRouter } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
+
 
 export default function IndexScreen() {
-  const router = useRouter();
-
+  const navigation = useNavigation();
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#5081FF' }}>
       <StatusBar backgroundColor="#5081FF" />

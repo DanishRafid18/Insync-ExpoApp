@@ -4,7 +4,8 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect, } from 'react';
 import 'react-native-reanimated';
-
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { Drawer } from 'expo-router/drawer';
 import {
   SafeAreaView,
   StatusBar,
@@ -16,6 +17,7 @@ import {
 } from 'react-native';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import DefaultHeader from './DefaultHeader';
+import AuthHeader from './AuthHeader';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -51,38 +53,17 @@ export default function RootLayout() {
   const headerTintColor = colorScheme === 'dark' ? '#FFFFFF' : '#000000';
 
   return (
-<ThemeProvider value={colorScheme === 'dark' ? MyDarkTheme : MyLightTheme}>
-  <Stack
-    screenOptions={{
-      headerStyle: {
-        backgroundColor: headerBackgroundColor,
-      },
-      headerTintColor: headerTintColor,
-      headerTitleStyle: { fontWeight: 'bold', color: headerTintColor },
-      headerLeft: () => (
-        <Image
-          source={headerLogo}
-          resizeMode="contain"
-          style={{ width: 100, height: 40, marginLeft: 0 }}
+    <ThemeProvider value={colorScheme === 'dark' ? MyDarkTheme : MyLightTheme}>
+      <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="explore" options={{ animation: 'fade_from_bottom' }} />
+        <Stack.Screen name="Login" options={{ animation: 'fade', header: () => <AuthHeader />, }} />
+        <Stack.Screen name="SignUp" options={{
+            header: () => <AuthHeader />,animation: 'fade'
+          }} 
         />
-      ),
-      headerTitle: '',
-      headerShadowVisible: false,
-    }}
-  >
-    <Stack.Screen name="index" options={{ headerShown: false }} />
-    <Stack.Screen name="explore" options={{ animation: 'fade_from_bottom' }} />
-    <Stack.Screen name="Login" options={{ animation: 'fade' }} />
-    <Stack.Screen name="SignUp" />
-    <Stack.Screen
-      name="Homepage"
-      options={{
-        header: () => <DefaultHeader />,
-        
-      }}
-    />
-  </Stack>
-</ThemeProvider>
-
+        <Stack.Screen name="drawer" options={{ headerShown: false }} />
+      </Stack>
+  </ThemeProvider>
   );
 }

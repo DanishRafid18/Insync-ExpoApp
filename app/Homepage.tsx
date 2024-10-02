@@ -22,16 +22,7 @@ export default function Homepage(){
     const TextColor = colorScheme === 'dark' ? '#dce1e8' : '#B3B9C2';
 
     return (
-        <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: '#f4511e',
-          },
-          headerTintColor: '#fff',
-          headerTitleStyle: {
-            fontWeight: 'bold',
-          },
-        }}>
+        <Stack>
         <Stack.Screen name="home" options={{}} />
       </Stack>
     );

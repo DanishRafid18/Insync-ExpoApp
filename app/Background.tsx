@@ -1,13 +1,12 @@
-
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, useColorScheme,Image, Button, Pressable } from 'react-native';
 import { useNavigation } from 'expo-router';
 import { DrawerActions } from '@react-navigation/native';
 
-const DefaultHeader = () => {
+const Background = () => {
   const { height: screenHeight } = Dimensions.get('window');
   const navigation = useNavigation()
-  const headerHeight = screenHeight * 0.10;
+  const headerHeight = screenHeight * 0.15;
   const colorScheme = useColorScheme();
   const MenuIcon = colorScheme === 'dark' ? require('@/assets/images/MenuBlack.png') : require('@/assets/images/MenuWhite.png');
 
@@ -16,23 +15,18 @@ const DefaultHeader = () => {
   }
 
   return (
-    <View style={[styles.headerContainer, { height: headerHeight, }]}>
-      <Pressable onPress={openDrawer}>
-      <Image
-          source={MenuIcon}
-          resizeMode="contain"
-          style={{ width: "15%", height: "30%", marginBottom: "2%", marginTop: "15%", }}
-        />
-        </Pressable>
+    <View style={[styles.headerContainer, { height: headerHeight, borderBottomLeftRadius: 10, borderBottomRightRadius: 10,}]}>
+
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   headerContainer: {
+    position:"relative",
     backgroundColor: '#5081FF',
     alignContent: 'space-around',
-    zIndex: 1000
+    zIndex: 0
   },
   headerTitle: {
     color: 'white',
@@ -41,4 +35,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DefaultHeader;
+export default Background;

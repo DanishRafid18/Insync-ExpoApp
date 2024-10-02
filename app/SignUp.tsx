@@ -101,6 +101,21 @@ export default function SignUpScreen(){
               </Text>
             </Pressable>
         </View>
+        <View style={{flexDirection:'row', alignSelf: 'center', position:"absolute", bottom: 0, marginBottom: "20%"}}>       
+          <Text style = {{marginRight: 10, color: colorScheme === 'dark' ? '#FFFFFF' : '#000000'}}> 
+            have an account? 
+          </Text>
+          <Pressable onPress={() => {
+            
+          router.push('/Login');
+        }}>
+            {({pressed}) => (
+              <Text style={{fontFamily:'DMSansBold',color: pressed ? "#88a9fc" : "#5081FF" }}>
+                {pressed ? 'Login' : 'Login'}
+                </Text>
+            )}
+          </Pressable>
+        </View> 
       </SafeAreaView>
     );
 }
