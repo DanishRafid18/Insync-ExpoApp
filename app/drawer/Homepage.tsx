@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, useColorScheme, Image, Pressable } from 'react-
 import Background from '../Background';
 import {Picker} from '@react-native-picker/picker';
 import { Dropdown, SelectCountry } from 'react-native-element-dropdown';
+import { router } from 'expo-router';
 
 interface UserData {
   first_name: string;
@@ -21,6 +22,8 @@ export default function Homepage(): JSX.Element {
   const TextColor = colorScheme === 'dark' ? '#FFFFFF' : '#FFFFFF'; 
   const [value, setValue] = useState(null);
   const GalleryImage = require('@/assets/images/HomepageGallery.jpg');
+  const EventImage = require('@/assets/images/HomepageEvent.jpg');
+
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -108,7 +111,7 @@ export default function Homepage(): JSX.Element {
             width: '80%',
             borderRadius: 10,
             overflow: 'hidden',
-            marginTop: 20,
+            marginTop: "45%",
             alignSelf: 'center',
           },
         ]}
@@ -127,6 +130,9 @@ export default function Homepage(): JSX.Element {
       </Pressable>
 
       <Pressable
+      onPress={() => {
+        router.push('./Events');
+      }}
         style={[
           styles.headerContainer,
           {
@@ -140,7 +146,7 @@ export default function Homepage(): JSX.Element {
         ]}
       >
         <Image
-          source={GalleryImage}
+          source={EventImage}
           resizeMode="cover"
           style={{
             width: '100%',

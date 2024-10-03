@@ -31,6 +31,7 @@ export default function IndexScreen() {
             />
           </View>
           <View
+          
             style={{
               flex: 1,
               justifyContent: 'flex-end',

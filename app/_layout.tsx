@@ -45,7 +45,7 @@ export default function RootLayout() {
     ...DarkTheme, colors:{...DarkTheme.colors, background: "#2c2c2c"}
   }
   const MyLightTheme = {
-    ...DefaultTheme, colors:{...DefaultTheme.colors, background: "#FFFFFF"}
+    ...DefaultTheme, colors:{...DefaultTheme.colors, background: "#EFF3FF"}
   }
 
   const headerBackgroundColor = colorScheme === 'dark' ? '#2c2c2c' : '#FFFFFF';
@@ -63,6 +63,7 @@ export default function RootLayout() {
           }} 
         />
         <Stack.Screen name="drawer" options={{ headerShown: false }} />
+        {/* <Stack.Screen name="Events" options={{ header: () => <DefaultHeader />}} /> */}
       </Stack>
   </ThemeProvider>
   );

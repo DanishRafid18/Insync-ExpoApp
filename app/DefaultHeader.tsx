@@ -8,7 +8,7 @@ import {
   Image,
   Pressable,
 } from 'react-native';
-import { useNavigation } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
 import { DrawerActions } from '@react-navigation/native';
 
 const DefaultHeader = () => {
@@ -22,12 +22,12 @@ const DefaultHeader = () => {
       : require('@/assets/images/MenuWhite.png');
 
   const openDrawer = () => {
-    navigation.dispatch(DrawerActions.toggleDrawer());
+    navigation.dispatch(DrawerActions.openDrawer());
   };
 
   return (
-    <View style={[styles.headerContainer, { height: headerHeight }]}>
-      <Pressable onPress={openDrawer}>
+    <View style={[styles.headerContainer, { height: headerHeight, zIndex: 1000,}]}>
+      <Pressable style={{zIndex:1000}}onPress={openDrawer}>
         <Image
           source={MenuIcon}
           resizeMode="contain"

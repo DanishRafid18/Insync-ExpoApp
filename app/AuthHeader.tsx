@@ -10,7 +10,7 @@ const AuthHeader = () => {
     colorScheme === 'dark'
       ? require('@/assets/images/WhiteTransparentLogo.png')
       : require('@/assets/images/BlackTransparentLogo.png');
-    const headerBackgroundColor = colorScheme === 'dark' ? '#2c2c2c' : '#FFFFFF';
+    const headerBackgroundColor = colorScheme === 'dark' ? '#2c2c2c' : '#EFF3FF';
 
   return (
     <View
