@@ -1,16 +1,13 @@
 import React from 'react';
 import {
   SafeAreaView,
-  StatusBar,
   View,
-  Image,
   Text,
   Pressable,
   TextInput,
   useColorScheme,
-  StyleSheet
 } from 'react-native';
-import { Href, Stack, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import { BlueTitleText } from '@/components/BlueTitleText';
 import { useNavigation } from '@react-navigation/native';
 

@@ -8,6 +8,8 @@ import {
   Image,
   Pressable,
   ScrollView,
+  Button,
+  TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import Background from '../Background';
@@ -28,7 +30,7 @@ export default function Events(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const TextColor = colorScheme === 'dark' ? '#FFFFFF' : '#000000';
+  const TextColor = colorScheme === 'dark' ? '#000000' : '#000000';
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -73,6 +75,7 @@ export default function Events(): JSX.Element {
           />
           <Text style={styles.backText}>Back</Text>
         </Pressable>
+        
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -107,6 +110,12 @@ export default function Events(): JSX.Element {
                 <Text style={[styles.eventDetails, { color: TextColor }]}>
                   End: {event.end_time}
                 </Text>
+                <Text style={[styles.eventDetails, { color: TextColor }]}>
+                  {event.location}
+                </Text>
+                <Text style={[styles.eventDetails, { color: TextColor }]}>
+                  {event.description}
+                </Text>
               </View>
             </Pressable>
           ))
@@ -114,6 +123,15 @@ export default function Events(): JSX.Element {
           <Text style={styles.noDataText}>No events found.</Text>
         )}
       </ScrollView>
+      <TouchableOpacity
+      onPress={() => {
+        router.push("/drawer/CreateEvent");
+      }}
+       style={styles.addButton}>
+      <Image
+        source={require('@/assets/images/add_icon.png')}
+      />
+    </TouchableOpacity>
     </View>
   );
 }
@@ -122,6 +140,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: 'relative',
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#5081FF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    zIndex: 2,
   },
   headerWrapper: {
     position: 'static',
@@ -149,7 +183,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingBottom: 20,
     marginTop: 20,
-    zIndex:1
+    zIndex:1,
+    height: "150%"
   },
   EventContainer: {
     backgroundColor: '#FFFFFF',

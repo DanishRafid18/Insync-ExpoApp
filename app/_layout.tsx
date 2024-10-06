@@ -56,14 +56,13 @@ export default function RootLayout() {
     <ThemeProvider value={colorScheme === 'dark' ? MyDarkTheme : MyLightTheme}>
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="explore" options={{ animation: 'fade_from_bottom' }} />
         <Stack.Screen name="Login" options={{ animation: 'fade', header: () => <AuthHeader />, }} />
         <Stack.Screen name="SignUp" options={{
             header: () => <AuthHeader />,animation: 'fade'
           }} 
         />
         <Stack.Screen name="drawer" options={{ headerShown: false }} />
-        {/* <Stack.Screen name="Events" options={{ header: () => <DefaultHeader />}} /> */}
+        {/* <Stack.Screen name="CreateEvent" options={{ header: () => <DefaultHeader />}} /> */}
       </Stack>
   </ThemeProvider>
   );
