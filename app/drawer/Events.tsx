@@ -85,9 +85,6 @@ export default function Events(): JSX.Element {
           events.map((event, index) => (
             <Pressable
               key={index}
-              // onPress={() => {
-              //   console.log(`Event pressed: ${event.event_name}`);
-              // }}
               style={[
                 styles.EventContainer,
                 {
@@ -184,7 +181,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     marginTop: 20,
     zIndex:1,
-    height: "150%"
+    height: "500%"
   },
   EventContainer: {
     backgroundColor: '#FFFFFF',

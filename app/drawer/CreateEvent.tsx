@@ -17,6 +17,9 @@ import {
 import { useRouter } from 'expo-router';
 import Background from '../Background';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import * as ImagePicker from 'expo-image-picker';
+import { ImagePickerAsset } from 'expo-image-picker';
+
 
 const CreateEvent = () => {
   const router = useRouter();
@@ -29,6 +32,20 @@ const CreateEvent = () => {
   const [endDateTime, setEndDateTime] = useState(new Date());
   const [location, setLocation] = useState('');
   const [description, setDescription] = useState('');
+  const [image, setImage] = useState<ImagePickerAsset | null>(null);
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 1,
+      base64: true,
+    });
+
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      setImage(result.assets[0]);
+    }
+  };
 
   const formatDate = (date: Date) => {
     const year = date.getFullYear(); //getting the whole year. e.g. "2024"
@@ -48,6 +65,9 @@ const CreateEvent = () => {
       end_time: formatDate(endDateTime),
       location: location,
       description: description,
+      privacy: 'Not Private',
+      story: image ? image.base64 : null,
+
     };
 
     try {
@@ -62,6 +82,7 @@ const CreateEvent = () => {
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Error response:', errorText);
+        console.error('Invalid data format:', body);
         Alert.alert('Failed to create event');
         return;
       }
@@ -177,6 +198,17 @@ const CreateEvent = () => {
             onChangeText={(text) => setDescription(text)}
           />
 
+          <Text style={styles.formText}>Event Image:</Text>
+                <Pressable onPress={pickImage} style={styles.imagePickerButton}>
+                  <Text style={styles.imagePickerText}>Pick an image</Text>
+                </Pressable>
+                {image && (
+                  <Image
+                    source={{ uri: image.uri }}
+                    style={{ width: 50, height: 50, marginTop: 10 }}
+                  />
+                )}
+
           <Pressable style={styles.submitButton} onPress={handleSubmit}>
             <Text style={styles.submitButtonText}>Submit</Text>
           </Pressable>
@@ -189,10 +221,24 @@ const CreateEvent = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    height: "500%"
   },
   keyboardAvoidingView:{
     flex: 1,
+    height: "500%"
+  },
+  imagePickerButton: {
+    backgroundColor: '#5081FF',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: '75%',
+    alignItems: 'center',
+  },
+  imagePickerText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
   },
   formText:{
     alignSelf:"center",
@@ -202,8 +248,9 @@ const styles = StyleSheet.create({
   form:{
     flex: 1,
     alignItems:"center",
-    marginTop: 100,
+    marginTop: 20,
     justifyContent: 'space-between',
+    height: "1000%"
   },
   inputField:{
     borderWidth: 1, 

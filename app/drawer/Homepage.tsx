@@ -104,6 +104,9 @@ export default function Homepage(): JSX.Element {
       )}
       
       <Pressable
+      onPress={() => {
+        router.push('./Gallery');
+      }}
         style={[
           styles.headerContainer,
           {
