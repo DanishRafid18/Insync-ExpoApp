@@ -1,20 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  Dimensions,
   useColorScheme,
   Image,
   Pressable,
   ScrollView,
-  Button,
   TouchableOpacity,
+  Alert,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import Background from '../Background';
+import { useFocusEffect } from '@react-navigation/native';
+
 
 interface EventData {
+  event_id: number;
   event_name: string;
   start_time: string;
   end_time: string;
@@ -32,32 +34,87 @@ export default function Events(): JSX.Element {
   const router = useRouter();
   const TextColor = colorScheme === 'dark' ? '#000000' : '#000000';
 
-  useEffect(() => {
-    const fetchEventData = async () => {
-      try {
-        const response = await fetch(
-          'https://deco3801-foundjesse.uqcloud.net/restapi/event.php?user=1'
-        );
-        if (!response.ok) {
-          console.error('HTTP error:', response.status);
-          return;
-        }
-        const data = await response.json();
-        console.log('Fetched events:', data);
-        if (Array.isArray(data)) {
-          setEvents(data);
-        } else {
-          console.error('Invalid data format:', data);
-        }
-      } catch (error) {
-        console.error('Fetch error:', error);
-      } finally {
-        setLoading(false);
+  const fetchEventData = async () => {
+    try {
+      const response = await fetch(
+        'https://deco3801-foundjesse.uqcloud.net/restapi/event.php?user=1'
+      );
+      if (!response.ok) {
+        console.error('HTTP error:', response.status);
+        return;
       }
-    };
+      const data = await response.json();
+      if (Array.isArray(data)) {
+        //get current date and time
+        const now = new Date();
 
-    fetchEventData();
-  }, []);
+        //filter out past events
+        const upcomingEvents = data.filter((event: EventData) => {
+          const eventEndTime = new Date(event.end_time);
+          return eventEndTime >= now;
+        });
+        console.log('Fetched events:', upcomingEvents);
+        setEvents(upcomingEvents);
+      } else {
+        console.error('Invalid data format:', data);
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useFocusEffect(
+    useCallback(() => {
+      fetchEventData();
+    }, [])
+  );
+
+  const handleDelete = async (eventId: number) => {
+    //confirm deletion
+    Alert.alert(
+      "Delete Event",
+      "Are you sure you want to delete this event?",
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => deleteEvent(eventId),
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+  
+
+  const deleteEvent = async (eventId: number) => {
+    try {
+      const response = await fetch(`https://deco3801-foundjesse.uqcloud.net/restapi/event.php`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ event_id: eventId }),
+      });
+  
+      if (response.ok) {
+        Alert.alert("Success", "Event deleted successfully!");
+        // Remove the deleted event from the state
+        setEvents((prevEvents) => prevEvents.filter((event) => event.event_id !== eventId));
+      } else {
+        const errorData = await response.json();
+        console.error('Delete error:', errorData);
+        Alert.alert("Error", errorData.message || "Failed to delete the event.");
+      }
+    } catch (error) {
+      console.error('Network error:', error);
+      Alert.alert("Error", "An error occurred while deleting the event.");
+    }
+  };
 
   return (
     <View  style={styles.container }>
@@ -73,7 +130,7 @@ export default function Events(): JSX.Element {
             style={styles.backIcon}
             source={require('@/assets/images/BackIcon.png')}
           />
-          <Text style={styles.backText}>Back</Text>
+          <Text style={styles.backText}>Events</Text>
         </Pressable>
         
       </View>
@@ -82,9 +139,9 @@ export default function Events(): JSX.Element {
         {loading ? (
           <Text style={styles.loadingText}>Loading...</Text>
         ) : events.length > 0 ? (
-          events.map((event, index) => (
+          events.map((event, event_id) => (
             <Pressable
-              key={index}
+              key={event_id}
               style={[
                 styles.EventContainer,
                 {
@@ -114,6 +171,15 @@ export default function Events(): JSX.Element {
                   {event.description}
                 </Text>
               </View>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDelete(event.event_id)}
+              >
+                <Image
+                  style={styles.deleteButton}
+                  source={require('@/assets/images/deleteIcon.png')}
+                />
+              </TouchableOpacity>
             </Pressable>
           ))
         ) : (
@@ -128,6 +194,7 @@ export default function Events(): JSX.Element {
       <Image
         source={require('@/assets/images/add_icon.png')}
       />
+
     </TouchableOpacity>
     </View>
   );
@@ -174,6 +241,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 25,
     marginLeft: 10,
+  },
+  deleteButton: {
+    width: 40,
+    height: 30,
+    resizeMode: 'contain',
+    alignSelf: 'flex-end',
+    marginRight: 5
   },
   scrollContainer: {
     flexGrow: 1,

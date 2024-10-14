@@ -12,14 +12,15 @@ import {
   KeyboardAvoidingView,
   TouchableWithoutFeedback, 
   Keyboard,
-  Platform
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import Background from '../Background';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { ImagePickerAsset } from 'expo-image-picker';
-
+import { Picker } from '@react-native-picker/picker';
+import { Dropdown } from 'react-native-element-dropdown';
 
 const CreateEvent = () => {
   const router = useRouter();
@@ -27,19 +28,28 @@ const CreateEvent = () => {
   const TextFieldColor = colorScheme === 'dark' ? '#2c2c2c' : '#FFFFFF';
   const TextColor = colorScheme === 'dark' ? '#dce1e8' : '#B3B9C2';
 
-  const [eventName, setEventName] = useState('');
-  const [startDateTime, setStartDateTime] = useState(new Date());
-  const [endDateTime, setEndDateTime] = useState(new Date());
-  const [location, setLocation] = useState('');
-  const [description, setDescription] = useState('');
+  const [eventName, setEventName] = useState<string>('');
+  const [startDateTime, setStartDateTime] = useState<Date>(new Date());
+  const [endDateTime, setEndDateTime] = useState<Date>(new Date());
+  const [location, setLocation] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [privacy, setPrivacy] = useState<string>('Not Private');
+  const [repeatEvent, setRepeatEvent] = useState<string>('No Repeat');
   const [image, setImage] = useState<ImagePickerAsset | null>(null);
+  const [uploading, setUploading] = useState<boolean>(false); //for setting up the loading... button
 
+  //function to pick an image
   const pickImage = async () => {
+    //request permission to access media library
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert('Permission Required', 'Camera roll permissions are required to select an image.');
+      return;
+    }
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       quality: 1,
-      base64: true,
     });
 
     if (!result.canceled && result.assets && result.assets.length > 0) {
@@ -47,7 +57,21 @@ const CreateEvent = () => {
     }
   };
 
-  const formatDate = (date: Date) => {
+  const privacyOptions = [
+    { label: 'Private', value: 'Private' },
+    { label: 'Not Private', value: 'Not Private' },
+  ];
+  
+  const repeatOptions = [
+    { label: 'No Repeat', value: 'No Repeat' },
+    { label: 'Daily', value: 'Daily' },
+    { label: 'Weekly', value: 'Weekly' },
+    { label: 'Monthly', value: 'Monthly' },
+    { label: 'Yearly', value: 'Yearly' },
+  ];  
+
+  //function to format Date object to 'Y-m-d H:i:s'
+  const formatDate = (date: Date): string => {
     const year = date.getFullYear(); //getting the whole year. e.g. "2024"
     const month = ('0'+(date.getMonth()+1)).slice(-2); //for some reason january is 0 so 1 is added to the value. Slice(-2) ensures the month is always two digits
     const day = ('0'+date.getDate()).slice(-2); //same for the rest
@@ -58,71 +82,96 @@ const CreateEvent = () => {
   };
 
   const handleSubmit = async () => {
-    const body = {
-      event_name: eventName,
-      user: 1,
-      start_time: formatDate(startDateTime),
-      end_time: formatDate(endDateTime),
-      location: location,
-      description: description,
-      privacy: 'Not Private',
-      story: image ? image.base64 : null,
+    setUploading(true);
 
-    };
+    // Create FormData
+    let formData = new FormData();
+    formData.append('event_name', eventName);
+    formData.append('user', '1');
+    formData.append('start_time', formatDate(startDateTime));
+    formData.append('end_time', formatDate(endDateTime));
+    formData.append('location', location);
+    formData.append('description', description);
+    formData.append('privacy', privacy);
+    formData.append('repeat_event', repeatEvent);
+
+    if (image) {
+      //extract filename and type
+      const uriParts = image.uri.split('/');
+      const fileName = uriParts[uriParts.length - 1];
+      const fileTypeMatch = /\.(\w+)$/.exec(fileName); //get the file type
+      const fileType = fileTypeMatch ? `image/${fileTypeMatch[1]}` : `image`; //check if its a valid file type
+
+      formData.append('photo', {
+        uri: image.uri,
+        name: fileName,
+        type: fileType,
+      } as any);
+    }
 
     try {
-      const response = await fetch('https://deco3801-foundjesse.uqcloud.net/restapi/event.php', {
+      const response = await fetch('https://deco3801-foundjesse.uqcloud.net/restapi/upload_event_photo.php', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'multipart/form-data',
         },
-        body: JSON.stringify(body),
+        body: formData,
       });
 
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
-        console.error('Invalid data format:', body);
-        Alert.alert('Failed to create event');
-        return;
+      if (response.status === 201) {
+        Alert.alert('Success', 'Event created successfully!');
+        router.back();//back after success
+      } else {
+        const errorData = await response.json();
+        console.error('Error response:', errorData);
+        Alert.alert('Error', errorData.message || 'Failed to create event.');
       }
-
-      const data = await response.json();
-      console.log('Event created successfully:', data);
-
-      Alert.alert('Event created successfully');
-
-      router.back();
     } catch (error) {
-      console.error('Error:', error);
-      Alert.alert('An error occurred');
+      console.error('Network Error:', error);
+      Alert.alert('Error', 'An error occurred while creating the event.');
+    } finally {
+      setUploading(false);
     }
   };
 
+  const resetForm = () => { //reset form when pressing back
+    setEventName('');
+    setStartDateTime(new Date());
+    setEndDateTime(new Date());
+    setLocation('');
+    setDescription('');
+    setPrivacy('Not Private');
+    setRepeatEvent('No Repeat');
+    setImage(null);
+  };
+
+
   return (
     
-    //KeyboardAvoidingView not working
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}  style={styles.keyboardAvoidingView} >
-      <Background/>
-        <View style={styles.headerWrapper}>
-          <Pressable
-            onPress={() => {
-              router.back();
-            }}
-            style={styles.backButton}
-          >
-            <Image
-              style={styles.backIcon}
-              source={require('@/assets/images/BackIcon.png')}
-            />
-            <Text style={styles.backText}>Create Event</Text>
-          </Pressable>
-        </View>
-        
-      
+    <><Background /><KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.keyboardAvoidingView}
+    >
+      {/* Header */}
+      <View style={styles.headerWrapper}>
+      <Pressable
+        onPress={() => {
+          resetForm();
+          router.push("/drawer/Events");
+        }}
+        style={styles.backButton}
+      >
+        <Image
+          style={styles.backIcon}
+          source={require('@/assets/images/BackIcon.png')}
+        />
+        <Text style={styles.backText}>Create Event</Text>
+      </Pressable>
+    </View>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={styles.form}>
-          {/* Event Name Form */}
+
+          {/* Event Name */}
           <Text style={styles.formText}>Event Name:</Text>
           <TextInput
             style={[
@@ -135,36 +184,33 @@ const CreateEvent = () => {
             placeholder='Event Name'
             placeholderTextColor={TextColor}
             value={eventName}
-            onChangeText={(text) => setEventName(text)}
-          />
+            onChangeText={setEventName} />
 
-          {/* Start Time Picker */}
+          {/* Start Time */}
           <Text style={styles.formText}>Start Time:</Text>
-            <DateTimePicker
-              value={startDateTime}
-              mode='datetime'
-              display='default'
-              onChange={(event, selectedDate) => {
-                if (selectedDate) {
-                  setStartDateTime(selectedDate);
-                }
-              }}
-            />
+          <DateTimePicker
+            value={startDateTime}
+            mode='datetime'
+            display='default'
+            onChange={(event, selectedDate) => {
+              if (selectedDate) {
+                setStartDateTime(selectedDate);
+              }
+            } } />
 
-          {/* End Time Picker */}
+          {/* End Time */}
           <Text style={styles.formText}>End Time:</Text>
-            <DateTimePicker
-              value={endDateTime}
-              mode='datetime'
-              display='default'
-              onChange={(event, selectedDate) => {
-                if (selectedDate) {
-                  setEndDateTime(selectedDate);
-                }
-              }}
-            />
+          <DateTimePicker
+            value={endDateTime}
+            mode='datetime'
+            display='default'
+            onChange={(event, selectedDate) => {
+              if (selectedDate) {
+                setEndDateTime(selectedDate);
+              }
+            } } />
 
-          {/* Location Form */}
+          {/* Location */}
           <Text style={styles.formText}>Location:</Text>
           <TextInput
             style={[
@@ -177,117 +223,107 @@ const CreateEvent = () => {
             placeholder='Location'
             placeholderTextColor={TextColor}
             value={location}
-            onChangeText={(text) => setLocation(text)}
-          />
+            onChangeText={setLocation} />
 
-          {/* Description Form */}
+          {/* Description */}
           <Text style={styles.formText}>Description:</Text>
           <TextInput
             style={[
               styles.inputField,
+              styles.textArea,
               {
                 backgroundColor: TextFieldColor,
                 color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
-                height: 150,
               },
             ]}
             placeholder='Description'
             placeholderTextColor={TextColor}
             multiline={true}
+            numberOfLines={4}
             value={description}
-            onChangeText={(text) => setDescription(text)}
-          />
+            onChangeText={setDescription} />
 
+          {/* Privacy and Repeat Event Dropdowns Side by Side */}
+          <View style={styles.rowContainer}>
+            {/* Privacy Dropdown */}
+            <View style={styles.dropdownWrapper}>
+              <Text style={styles.dropdownLabel}>Privacy:</Text>
+              <Dropdown
+                style={styles.dropdown}
+                data={privacyOptions}
+                labelField="label"
+                valueField="value"
+                placeholder="Select Privacy"
+                value={privacy}
+                onChange={(item) => {
+                  setPrivacy(item.value);
+                } }
+                selectedTextStyle={{ color: colorScheme === 'dark' ? '#FFFFFF' : '#000000' }}
+                containerStyle={{ backgroundColor: TextFieldColor }}
+                placeholderStyle={{ color: TextColor }} />
+            </View>
+
+            {/* Repeat Event Dropdown */}
+            <View style={styles.dropdownWrapper}>
+              <Text style={styles.dropdownLabel}>Repeat Event:</Text>
+              <Dropdown
+                style={styles.dropdown}
+                data={repeatOptions}
+                labelField="label"
+                valueField="value"
+                placeholder="Select Repeat"
+                value={repeatEvent}
+                onChange={(item) => {
+                  setRepeatEvent(item.value);
+                } }
+                selectedTextStyle={{ color: colorScheme === 'dark' ? '#FFFFFF' : '#000000' }}
+                containerStyle={{ backgroundColor: TextFieldColor }}
+                placeholderStyle={{ color: TextColor }} />
+            </View>
+          </View>
+
+          {/* Image Picker */}
           <Text style={styles.formText}>Event Image:</Text>
-                <Pressable onPress={pickImage} style={styles.imagePickerButton}>
-                  <Text style={styles.imagePickerText}>Pick an image</Text>
-                </Pressable>
-                {image && (
-                  <Image
-                    source={{ uri: image.uri }}
-                    style={{ width: 50, height: 50, marginTop: 10 }}
-                  />
-                )}
+          <Pressable onPress={pickImage} style={styles.imagePickerButton}>
+            <Text style={styles.imagePickerText}>Pick an Image</Text>
+          </Pressable>
+          {image && (
+            <Image
+              source={{ uri: image.uri }}
+              style={styles.selectedImage} />
+          )}
 
-          <Pressable style={styles.submitButton} onPress={handleSubmit}>
-            <Text style={styles.submitButtonText}>Submit</Text>
+          {/* Submit Button */}
+          <Pressable
+            style={[styles.submitButton, uploading && styles.buttonDisabled]}
+            onPress={handleSubmit}
+            disabled={uploading}
+          >
+            <Text style={styles.submitButtonText}>
+              {uploading ? 'Uploading...' : 'Create Event'}
+            </Text>
           </Pressable>
         </ScrollView>
       </TouchableWithoutFeedback>
-    </KeyboardAvoidingView>
+    </KeyboardAvoidingView></>
   );
 };
 
-
 const styles = StyleSheet.create({
-  container: {
+  keyboardAvoidingView: {
     flex: 1,
-    height: "500%"
-  },
-  keyboardAvoidingView:{
-    flex: 1,
-    height: "500%"
-  },
-  imagePickerButton: {
-    backgroundColor: '#5081FF',
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 10,
-    width: '75%',
-    alignItems: 'center',
-  },
-  imagePickerText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-  formText:{
-    alignSelf:"center",
-    marginBottom: 10,
-    width:"75%",
-  },
-  form:{
-    flex: 1,
-    alignItems:"center",
-    marginTop: 20,
-    justifyContent: 'space-between',
-    height: "1000%"
-  },
-  inputField:{
-    borderWidth: 1, 
-    borderColor:"#5081FF", 
-    borderRadius:5, 
-    height: 50,
-    padding: 10,
-    marginBottom: 20,
-    width: "75%",
-    alignSelf: "center"
-  },
-  headerWrapper: {
-    position: 'static',
-    zIndex: 1,
     marginTop: 50
   },
-  submitButton: {
-    backgroundColor: '#5081FF',
-    padding: 15,
-    borderRadius: 5,
+  headerWrapper: {
     marginTop: 20,
-    width: '75%',
-    alignItems: 'center',
-    marginBottom:100
-  },
-  submitButtonText: {
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-    fontSize: 18,
+    marginBottom: 10,
+    alignItems: 'flex-start',
+    paddingHorizontal: 20,
   },
   backButton: {
     flexDirection: 'row',
-    marginLeft: 20,
-    marginTop: 40,
     alignItems: 'center',
   },
-  
   backIcon: {
     width: 24,
     height: 24,
@@ -299,35 +335,89 @@ const styles = StyleSheet.create({
     fontSize: 25,
     marginLeft: 10,
   },
-  scrollContainer: {
-    flexGrow: 1,
+  form: {
+    paddingHorizontal: 20,
+    paddingBottom: 40,
     alignItems: 'center',
-    paddingBottom: 20,
-    marginTop: 20,
-    zIndex:1
+    marginTop: 30
   },
-  EventContainer: {
-    backgroundColor: '#FFFFFF',
-    alignContent: 'space-around',
-    zIndex: 1,
+  formText: {
+    alignSelf: 'flex-start',
+    marginBottom: 5,
+    marginTop: 15,
+    fontWeight: 'bold',
+    fontSize: 16,
+    width: '100%',
   },
-  textContainer: {
+  inputField: {
+    borderWidth: 1, 
+    borderColor: '#5081FF', 
+    borderRadius: 5, 
+    height: 50,
     padding: 10,
+    marginBottom: 20,
+    width: '100%',
   },
-  eventName: {
-    fontSize: 20,
+  textArea: {
+    height: 100,
+    textAlignVertical: 'top',
+  },
+  rowContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  dropdownWrapper: {
+    flex: 1,
+    marginRight: 10,
+  },
+  dropdownLabel: {
+    marginBottom: 5,
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  dropdown: {
+    height: 50,
+    borderColor: '#5081FF',
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    backgroundColor: '#FFFFFF',
+  },
+  imagePickerButton: {
+    backgroundColor: '#5081FF',
+    padding: 10,
+    borderRadius: 5,
+    marginTop: 10,
+    width: '100%',
+    alignItems: 'center',
+  },
+  imagePickerText: {
+    color: '#FFFFFF',
     fontWeight: 'bold',
   },
-  eventDetails: {
-    fontSize: 14,
+  selectedImage: {
+    width: 100,
+    height: 100,
+    marginTop: 10,
+    borderRadius: 5,
   },
-  loadingText: {
+  submitButton: {
+    backgroundColor: '#5081FF',
+    padding: 15,
+    borderRadius: 5,
     marginTop: 20,
-    fontSize: 18,
+    width: '100%',
+    alignItems: 'center',
   },
-  noDataText: {
-    marginTop: 20,
+  buttonDisabled: {
+    backgroundColor: '#A0C1FF',
+  },
+  submitButtonText: {
+    color: '#FFFFFF',
+    fontWeight: 'bold',
     fontSize: 18,
   },
 });
+
 export default CreateEvent;
