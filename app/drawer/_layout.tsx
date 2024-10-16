@@ -11,6 +11,8 @@ export default function DrawerLayout() {
       <Drawer.Screen name="Gallery" options={{header: () => <DefaultHeader/>, drawerType: 'front'}} />
       <Drawer.Screen name="UploadStory" options={{headerShown: false,  drawerItemStyle: { display: 'none' }, drawerType: 'front'}} />
       <Drawer.Screen name="InviteMember" options={{headerShown: false,  drawerItemStyle: { display: 'none' }, drawerType: 'front'}} />
+      <Drawer.Screen name="UploadtoGallery" options={{headerShown: false,  drawerItemStyle: { display: 'none' }, drawerType: 'front'}} />
+
     </Drawer>
   );
 }

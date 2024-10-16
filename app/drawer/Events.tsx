@@ -235,7 +235,6 @@ export default function Events(): JSX.Element {
       <Image
         source={require('@/assets/images/add_icon.png')}
       />
-
     </TouchableOpacity>
     </View>
   );
