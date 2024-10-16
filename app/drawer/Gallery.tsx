@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, ScrollView, Text, Dimensions, Pressable } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, StyleSheet, Image, ScrollView, Text, Dimensions, Pressable, Button } from 'react-native';
 import Background from '../Background';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
 
 interface ImageItem {
+  is_uploader: any;
   photo_id: number;
   filename: string;
   upload_date: string;
@@ -12,58 +15,69 @@ interface ImageItem {
 
 export default function Gallery() {
   const [images, setImages] = useState<ImageItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(true); //loading state
+  const [loading, setLoading] = useState<boolean>(true);
+  const [userId, setUserId] = useState<string | null>(null);
 
+  //fetch userId from AsyncStorage
   useEffect(() => {
-    const fetchImages = async () => {
+    const getUserId = async () => {
       try {
-        const response = await fetch('https://deco3801-foundjesse.uqcloud.net/restapi/photo.php?uploader=1');
-        if (!response.ok) {
-          console.error('HTTP error:', response.status);
-          return;
+        const id = await AsyncStorage.getItem('user_id');
+        if (id !== null) {
+          setUserId(id);
+        } else {
+          console.error('No user_id found in AsyncStorage');
+          setLoading(false);
         }
-        const json = await response.json();
-
-        //the base URL where images are hosted
-        const baseURL = 'https://deco3801-foundjesse.uqcloud.net/uploads/';
-
-        //map the fetched data to include the full image URL
-        const imagesWithURL: ImageItem[] = json.map((item: any) => ({
-          photo_id: item.photo_id,
-          filename: item.filename,
-          upload_date: item.upload_date,
-          url: `${baseURL}${item.filename}`, //the constructed URL. so for example: https://deco3801-foundjesse.uqcloud.net/IMG_6427.jpg
-        }));
-
-        setImages(imagesWithURL);
-        console.log("Images fetched successfully:", imagesWithURL);
       } catch (error) {
-        console.error('Fetch error:', error);
-      } finally {
-        setLoading(false); //end loading
+        console.error('Error retrieving user_id:', error);
+        setLoading(false);
       }
     };
-    fetchImages();
+    getUserId();
   }, []);
+
+  
+
+  useFocusEffect(
+    useCallback(() => {
+      const fetchImages = async () => {
+        if (userId !== null) {
+          try {
+            const response = await fetch(`https://deco3801-foundjesse.uqcloud.net/restapi/photo.php?user_id=${userId}`);
+            if (!response.ok) {
+              console.error('HTTP error:', response.status);
+              return;
+            }
+            const json = await response.json();
+
+            const baseURL = 'https://deco3801-foundjesse.uqcloud.net/uploads/';
+
+            //map the fetched data to include the full image URL
+            const imagesWithURL: ImageItem[] = json.map((item: any) => ({
+              photo_id: item.photo_id,
+              filename: item.filename,
+              upload_date: item.upload_date,
+              url: `${baseURL}${item.filename}`,
+              is_uploader: item.is_uploader === 1,
+            }));
+
+            setImages(imagesWithURL);
+            console.log('Images fetched successfully:', imagesWithURL);
+          } catch (error) {
+            console.error('Fetch error:', error);
+          } finally {
+            setLoading(false);
+          }
+        }
+      };
+      fetchImages();
+    }, [userId])
+  );
 
   return (
     <>
-      <Background />
-      <View style={styles.headerWrapper}>
-        <Pressable
-          onPress={() => {
-            router.back();
-          }}
-          style={styles.backButton}
-        >
-          <Image
-            style={styles.backIcon}
-            source={require('@/assets/images/BackIcon.png')}
-          />
-          <Text style={styles.backText}>Gallery</Text>
-        </Pressable>
-        
-      </View>
+    <Background></Background>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.imageContainer}>
           {loading ? (
@@ -77,8 +91,32 @@ export default function Gallery() {
                   resizeMode="cover"
                 />
                 <Text style={styles.uploadDate}>
-                  Photo Last updated on: {"\n"}{item.upload_date}
+                  Photo Last updated on:{'\n'}
+                  {item.upload_date}
                 </Text>
+                
+                <Pressable
+          style={({ pressed }) => [
+            {
+              backgroundColor: pressed ? 'rgb(210, 230, 255)' : '#5081FF',
+              padding: 10,
+              borderRadius: 5,
+              marginTop: 20,
+              alignSelf: 'flex-end'
+            },
+          ]}
+        >
+          <Text
+            style={{
+              textAlign: 'center',
+              fontFamily: 'DMSansBold',
+              color: '#FFFFFF',
+              fontSize: 20,
+            }}
+          >
+            Edit
+          </Text>
+        </Pressable>
               </View>
             ))
           ) : (
@@ -103,7 +141,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     padding: 10,
     paddingBottom: 30,
-    marginTop: 50,
+    marginTop: 70,
     backgroundColor: 'transparent',
   },
   imageContainer: {

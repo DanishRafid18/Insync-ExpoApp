@@ -61,6 +61,10 @@ export default function RootLayout() {
             header: () => <AuthHeader />,animation: 'fade'
           }} 
         />
+        <Stack.Screen name="UploadPhoto" options={{
+            header: () => <AuthHeader />,animation: 'fade'
+          }} 
+        />
         <Stack.Screen name="drawer" options={{ headerShown: false }} />
         {/* <Stack.Screen name="CreateEvent" options={{ header: () => <DefaultHeader />}} /> */}
       </Stack>

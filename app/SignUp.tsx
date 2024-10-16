@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   SafeAreaView,
   StatusBar,
@@ -8,7 +8,7 @@ import {
   Pressable,
   TextInput,
   useColorScheme,
-  StyleSheet
+  Alert
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { BlueTitleText } from '@/components/BlueTitleText';
@@ -17,105 +17,161 @@ import { BlueTitleText } from '@/components/BlueTitleText';
 export default function SignUpScreen(){
     const router = useRouter();
     const colorScheme = useColorScheme();
+    const [firstName, setFirstName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
     const TextFieldColor = colorScheme === 'dark' ? '#2c2c2c' : '#FFFFFF';
     const TextColor = colorScheme === 'dark' ? '#dce1e8' : '#B3B9C2';
 
+    const handleSignUp = async () => {
+      // router.replace('/UploadPhoto');
+      if (password !== confirmPassword) {
+        Alert.alert('Error', 'Passwords do not match');
+        return;
+      }
+  
+      try {
+        //create FormData and append input values
+        const formData = new FormData();
+        formData.append('first_name', firstName);
+        formData.append('email', email);
+        formData.append('password', password);
+  
+
+        const response = await fetch('https://deco3801-foundjesse.uqcloud.net/restapi/api.php', {
+          method: 'POST',
+          body: formData, //use FormData as the body
+          headers: {
+            'Content-Type': 'multipart/form-data', //the content type for FormData
+          },
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok) {
+          Alert.alert('Success', 'Account created successfully');
+          router.replace('/UploadPhoto');  //continue to upload photo
+        } else {
+          Alert.alert('Error', data.message || 'Something went wrong');
+        }
+      } catch (error) {
+        Alert.alert('Error', 'Unable to sign up. Please try again later.');
+      }
+    };
+  
     return (
-      <SafeAreaView style={{ flex: 1}}>
-        <View style= {{ width: 325, alignSelf: 'center', marginTop: 100 }}>
-            <BlueTitleText style = {{width:500, fontSize: 40, marginBottom: 30}}>
-                Create Account
-            </BlueTitleText>
-            <TextInput 
-            style = 
-                {{
-                    backgroundColor: TextFieldColor, 
-                    borderWidth: 1, 
-                    borderColor:"#5081FF", 
-                    borderRadius:5, 
-                    height: 50,
-                    padding: 10,
-                    color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
-                    marginBottom: 20
-                }}
-            placeholder='Full Name'
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ width: 325, alignSelf: 'center', marginTop: 100 }}>
+          <BlueTitleText style={{ width: 500, fontSize: 40, marginBottom: 30 }}>
+            Create Account
+          </BlueTitleText>
+  
+          <TextInput
+            style={{
+              backgroundColor: TextFieldColor,
+              borderWidth: 1,
+              borderColor: '#5081FF',
+              borderRadius: 5,
+              height: 50,
+              padding: 10,
+              color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+              marginBottom: 20,
+            }}
+            placeholder="Name"
             placeholderTextColor={TextColor}
-            >
-            </TextInput>
-            <TextInput 
-            style = 
-                {{
-                    backgroundColor: TextFieldColor, 
-                    borderWidth: 1, 
-                    borderColor:"#5081FF", 
-                    borderRadius:5, 
-                    height: 50,
-                    padding: 10,
-                    color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
-                    marginBottom: 20
-                }}
-            placeholder='Email'
+            value={firstName}
+            onChangeText={setFirstName}
+          />
+  
+          <TextInput
+            style={{
+              backgroundColor: TextFieldColor,
+              borderWidth: 1,
+              borderColor: '#5081FF',
+              borderRadius: 5,
+              height: 50,
+              padding: 10,
+              color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+              marginBottom: 20,
+            }}
+            placeholder="Email"
             placeholderTextColor={TextColor}
-            >
-            </TextInput>
-            <TextInput 
-            style = 
-                {{
-                    backgroundColor: TextFieldColor, 
-                    borderWidth: 1, 
-                    borderColor:"#5081FF", 
-                    borderRadius:5, 
-                    height: 50,
-                    padding: 10,
-                    color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
-                    marginBottom: 20
-                }}
-            placeholder='Password'
+            value={email}
+            onChangeText={setEmail}
+          />
+  
+          <TextInput
+            style={{
+              backgroundColor: TextFieldColor,
+              borderWidth: 1,
+              borderColor: '#5081FF',
+              borderRadius: 5,
+              height: 50,
+              padding: 10,
+              color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+              marginBottom: 20,
+            }}
+            placeholder="Password"
             placeholderTextColor={TextColor}
-            >
-            </TextInput>
-            <TextInput 
-            style = 
-                {{
-                    backgroundColor: TextFieldColor, 
-                    borderWidth: 1, 
-                    borderColor:"#5081FF", 
-                    borderRadius:5, 
-                    height: 50,
-                    padding: 10,
-                    color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
-                    marginBottom: 20
-                }}
-            placeholder='Confirm Password'
+            secureTextEntry={true}
+            value={password}
+            onChangeText={setPassword}
+          />
+  
+          <TextInput
+            style={{
+              backgroundColor: TextFieldColor,
+              borderWidth: 1,
+              borderColor: '#5081FF',
+              borderRadius: 5,
+              height: 50,
+              padding: 10,
+              color: colorScheme === 'dark' ? '#FFFFFF' : '#000000',
+              marginBottom: 20,
+            }}
+            placeholder="Confirm Password"
             placeholderTextColor={TextColor}
-            >
-            </TextInput>
-            <Pressable style = {({pressed}) => [
-                  { //pressed code from https://reactnative.dev/docs/pressable under
-                    backgroundColor: pressed ? 'rgb(210, 230, 255)' :  "#5081FF",  padding: 10, borderRadius: 5, marginLeft: "65%", marginTop: 20
-                  }
-                ]}>
-              <Text style={{textAlign:'center', fontFamily: "DMSansBold", color: "#FFFFFF", fontSize: 20,}} >
-                SIGN UP
-              </Text>
-            </Pressable>
+            secureTextEntry={true}
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+          />
+  
+          <Pressable
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed ? 'rgb(210, 230, 255)' : '#5081FF',
+                padding: 10,
+                borderRadius: 5,
+                marginLeft: '65%',
+                marginTop: 20,
+              },
+            ]}
+            onPress={handleSignUp}
+          >
+            <Text style={{ textAlign: 'center', fontFamily: 'DMSansBold', color: '#FFFFFF', fontSize: 20 }}>
+              SIGN UP
+            </Text>
+          </Pressable>
         </View>
-        <View style={{flexDirection:'row', alignSelf: 'center', position:"absolute", bottom: 0, marginBottom: "20%"}}>       
-          <Text style = {{marginRight: 10, color: colorScheme === 'dark' ? '#FFFFFF' : '#000000'}}> 
-            have an account? 
+  
+        <View style={{ flexDirection: 'row', alignSelf: 'center', position: 'absolute', bottom: 0, marginBottom: '20%' }}>
+          <Text style={{ marginRight: 10, color: colorScheme === 'dark' ? '#FFFFFF' : '#000000' }}>
+            Have an account?
           </Text>
-          <Pressable onPress={() => {
-            
-          router.push('/Login');
-        }}>
-            {({pressed}) => (
-              <Text style={{fontFamily:'DMSansBold',color: pressed ? "#88a9fc" : "#5081FF" }}>
+          <Pressable
+            onPress={() => {
+              router.replace('/Login');
+            }}
+          >
+            {({ pressed }) => (
+              <Text style={{ fontFamily: 'DMSansBold', color: pressed ? '#88a9fc' : '#5081FF' }}>
                 {pressed ? 'Login' : 'Login'}
-                </Text>
+              </Text>
             )}
           </Pressable>
-        </View> 
+        </View>
       </SafeAreaView>
     );
-}
+  }

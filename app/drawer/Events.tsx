@@ -12,7 +12,8 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import Background from '../Background';
-import { useFocusEffect } from '@react-navigation/native';
+import { useFocusEffect } from '@react-navigation/native'; //https://reactnavigation.org/docs/use-focus-effect/
+import AsyncStorage from '@react-native-async-storage/async-storage'; //https://react-native-async-storage.github.io/async-storage/docs/usage/
 
 
 interface EventData {
@@ -33,42 +34,82 @@ export default function Events(): JSX.Element {
   const colorScheme = useColorScheme();
   const router = useRouter();
   const TextColor = colorScheme === 'dark' ? '#000000' : '#000000';
+  const [userId, setUserId] = useState<string | null>(null);
 
-  const fetchEventData = async () => {
-    try {
-      const response = await fetch(
-        'https://deco3801-foundjesse.uqcloud.net/restapi/event.php?user=1'
-      );
-      if (!response.ok) {
-        console.error('HTTP error:', response.status);
-        return;
+   //fetch userId from AsyncStorage
+   useEffect(() => {
+    const getUserId = async () => {
+      try {
+        const id = await AsyncStorage.getItem('user_id');
+        if (id !== null) {
+          setUserId(id);
+        } else {
+          console.error('No user_id found in AsyncStorage');
+          setLoading(false); //stop loading if user_id is not found
+        }
+      } catch (error) {
+        console.error('Error retrieving user_id:', error);
+        setLoading(false);
       }
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        //get current date and time
-        const now = new Date();
+    };
 
-        //filter out past events
-        const upcomingEvents = data.filter((event: EventData) => {
-          const eventEndTime = new Date(event.end_time);
-          return eventEndTime >= now;
-        });
-        console.log('Fetched events:', upcomingEvents);
-        setEvents(upcomingEvents);
-      } else {
-        console.error('Invalid data format:', data);
-      }
-    } catch (error) {
-      console.error('Fetch error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    getUserId();
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
+      const fetchEventData = async () => {
+        if (userId !== null) {
+          try {
+            setLoading(true);
+
+            const response = await fetch(
+              `https://deco3801-foundjesse.uqcloud.net/restapi/event.php?user=${userId}`
+            );
+            if (!response.ok) {
+              console.error('HTTP error:', response.status);
+              setLoading(false);
+              return;
+            }
+            const data = await response.json();
+            if (Array.isArray(data)) {
+              //get current date and time
+              const now = new Date();
+
+              //filter out past events
+              const upcomingEvents = data.filter((event: EventData) => {
+                const eventEndTime = new Date(event.end_time);
+                return eventEndTime >= now;
+              });
+
+              //remove duplicate events based on event_id
+              const uniqueEvents = removeDuplicateEvents(upcomingEvents);
+              console.log('Fetched events:', uniqueEvents);
+              setEvents(uniqueEvents);
+            } else {
+              console.error('Invalid data format:', data);
+            }
+          } catch (error) {
+            console.error('Fetch error:', error);
+          } finally {
+            setLoading(false);
+          }
+        }
+      };
       fetchEventData();
-    }, [])
+    }, [userId]) //whenever userId changes, useCallback will recreate the callback function. (run it back)
   );
+
+
+  const removeDuplicateEvents = (events: EventData[]): EventData[] => {
+    const uniqueEventMap = new Map<number, EventData>();
+    events.forEach((event) => {
+      if (!uniqueEventMap.has(event.event_id)) { //for each event check if the same id already exist in the uniqueEventMap
+        uniqueEventMap.set(event.event_id, event);
+      }
+    });
+    return Array.from(uniqueEventMap.values());
+  };
 
   const handleDelete = async (eventId: number) => {
     //confirm deletion
@@ -78,11 +119,11 @@ export default function Events(): JSX.Element {
       [
         {
           text: "Cancel",
-          style: "cancel",
+          style: "cancel", //https://reactnative.dev/docs/alert
         },
         {
           text: "Delete",
-          style: "destructive",
+          style: "destructive", //https://reactnative.dev/docs/alert
           onPress: () => deleteEvent(eventId),
         },
       ],
@@ -103,8 +144,8 @@ export default function Events(): JSX.Element {
   
       if (response.ok) {
         Alert.alert("Success", "Event deleted successfully!");
-        // Remove the deleted event from the state
-        setEvents((prevEvents) => prevEvents.filter((event) => event.event_id !== eventId));
+        //remove the deleted event from the state
+        setEvents((prevEvents) => prevEvents.filter((event) => event.event_id !== eventId)); //get the previous events(prevEvents) then filter it without the eventId thats being deleted
       } else {
         const errorData = await response.json();
         console.error('Delete error:', errorData);
@@ -141,7 +182,7 @@ export default function Events(): JSX.Element {
         ) : events.length > 0 ? (
           events.map((event, event_id) => (
             <Pressable
-              key={event_id}
+              key={event.event_id} //every recurring elements need a key, so the key in this is the event_id
               style={[
                 styles.EventContainer,
                 {
@@ -255,7 +296,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     marginTop: 20,
     zIndex:1,
-    height: "500%"
   },
   EventContainer: {
     backgroundColor: '#FFFFFF',

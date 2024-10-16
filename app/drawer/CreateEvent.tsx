@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -21,6 +21,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { ImagePickerAsset } from 'expo-image-picker';
 import { Picker } from '@react-native-picker/picker';
 import { Dropdown } from 'react-native-element-dropdown';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CreateEvent = () => {
   const router = useRouter();
@@ -37,13 +38,33 @@ const CreateEvent = () => {
   const [repeatEvent, setRepeatEvent] = useState<string>('No Repeat');
   const [image, setImage] = useState<ImagePickerAsset | null>(null);
   const [uploading, setUploading] = useState<boolean>(false); //for setting up the loading... button
+  const [userId, setUserId] = useState<string | null>(null);
+
+  //fetch userId from AsyncStorage
+  useEffect(() => {
+    const getUserId = async () => {
+      try {
+        const id = await AsyncStorage.getItem('user_id');
+        if (id !== null) {
+          setUserId(id);
+        }
+      } catch (error) {
+        console.error('Error retrieving user_id:', error);
+      }
+    };
+
+    getUserId();
+  }, []);
 
   //function to pick an image
   const pickImage = async () => {
     //request permission to access media library
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Permission Required', 'Camera roll permissions are required to select an image.');
+      Alert.alert(
+        'Permission Required',
+        'Camera roll permissions are required to select an image.'
+      );
       return;
     }
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -61,14 +82,14 @@ const CreateEvent = () => {
     { label: 'Private', value: 'Private' },
     { label: 'Not Private', value: 'Not Private' },
   ];
-  
+
   const repeatOptions = [
     { label: 'No Repeat', value: 'No Repeat' },
     { label: 'Daily', value: 'Daily' },
     { label: 'Weekly', value: 'Weekly' },
     { label: 'Monthly', value: 'Monthly' },
     { label: 'Yearly', value: 'Yearly' },
-  ];  
+  ];
 
   //function to format Date object to 'Y-m-d H:i:s'
   const formatDate = (date: Date): string => {
@@ -82,12 +103,16 @@ const CreateEvent = () => {
   };
 
   const handleSubmit = async () => {
+    if (!userId) {
+      Alert.alert('Error', 'User ID not found. Please log in again.');
+      return;
+    }
     setUploading(true);
 
-    // Create FormData
+    //i have to use FormData to upload a picture
     let formData = new FormData();
     formData.append('event_name', eventName);
-    formData.append('user', '1');
+    formData.append('user', userId);
     formData.append('start_time', formatDate(startDateTime));
     formData.append('end_time', formatDate(endDateTime));
     formData.append('location', location);
@@ -110,13 +135,16 @@ const CreateEvent = () => {
     }
 
     try {
-      const response = await fetch('https://deco3801-foundjesse.uqcloud.net/restapi/upload_event_photo.php', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-        body: formData,
-      });
+      const response = await fetch(
+        'https://deco3801-foundjesse.uqcloud.net/restapi/upload_event_photo.php',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          body: formData,
+        }
+      );
 
       if (response.status === 201) {
         Alert.alert('Success', 'Event created successfully!');
@@ -144,8 +172,6 @@ const CreateEvent = () => {
     setRepeatEvent('No Repeat');
     setImage(null);
   };
-
-
   return (
     
     <><Background /><KeyboardAvoidingView
