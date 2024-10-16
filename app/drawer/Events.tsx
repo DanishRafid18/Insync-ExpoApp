@@ -180,9 +180,9 @@ export default function Events(): JSX.Element {
         {loading ? (
           <Text style={styles.loadingText}>Loading...</Text>
         ) : events.length > 0 ? (
-          events.map((event, event_id) => (
+          events.map((event) => (
             <Pressable
-              key={event.event_id} //every recurring elements need a key, so the key in this is the event_id
+              key={event.event_id}
               style={[
                 styles.EventContainer,
                 {
@@ -195,6 +195,8 @@ export default function Events(): JSX.Element {
                 },
               ]}
             >
+               <View style={styles.eventContent}>
+              
               <View style={styles.textContainer}>
                 <Text style={[styles.eventName, { color: TextColor }]}>
                   {event.event_name}
@@ -212,6 +214,30 @@ export default function Events(): JSX.Element {
                   {event.description}
                 </Text>
               </View>
+              {event.story ? (
+                <Image
+                  source={{ uri: `https://deco3801-foundjesse.uqcloud.net/uploads/${event.story}` }}
+                  style={styles.eventImage}
+                  resizeMode="cover"
+                />
+              ) : (
+                <View>
+                  <Pressable style = {styles.UploadStoryBox}>
+                  <Text style = {{textAlign: 'center', top: "40%"}}>+ Add story</Text>
+                  </Pressable>
+                </View>
+              )}
+              <TouchableOpacity
+                style={styles.editButton}
+                onPress={() => {
+                  router.push({ pathname: './EditEvent', params: { event_id: event.event_id } });
+                }}
+              >
+                <Image
+                  style={styles.deleteButton}
+                  source={require('@/assets/images/editIcon.png')}
+                />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.deleteButton}
                 onPress={() => handleDelete(event.event_id)}
@@ -221,6 +247,7 @@ export default function Events(): JSX.Element {
                   source={require('@/assets/images/deleteIcon.png')}
                 />
               </TouchableOpacity>
+              </View>
             </Pressable>
           ))
         ) : (
@@ -244,6 +271,74 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     position: 'relative',
+  },
+  UploadStoryBox: {
+    marginRight: 10,
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    borderWidth: 5,
+    borderColor: "#E0E0E0",
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    paddingBottom: 20,
+    marginTop: 20,
+    zIndex: 1,
+  },
+  EventContainer: {
+    backgroundColor: '#FFFFFF',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 2,
+    position: 'relative',
+  },
+  eventContent: {
+    flexDirection: 'row', 
+    padding: 10,
+    alignItems: 'center'
+  },
+  eventImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  eventImagePlaceholder: {
+    width: 100,
+    height: 100,
+    backgroundColor: '#E0E0E0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 10,
+    marginRight: 10,
+  },
+  textContainer: {
+    flex: 1,
+    justifyContent: 'space-between', 
+  },
+  eventName: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  eventDetails: {
+    fontSize: 14,
+    marginTop: 2,
+  },
+  deleteButton: {
+    position: 'absolute',
+    top: 50,
+    right: 10,
+    width: 36,
+    height: 36,
+  },
+  editButton: {
+    position: 'absolute',
+    top: 50,
+    right: 75,
+    width: 36,
+    height: 36,
   },
   addButton: {
     position: 'absolute',
@@ -281,35 +376,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 25,
     marginLeft: 10,
-  },
-  deleteButton: {
-    width: 40,
-    height: 30,
-    resizeMode: 'contain',
-    alignSelf: 'flex-end',
-    marginRight: 5
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    alignItems: 'center',
-    paddingBottom: 20,
-    marginTop: 20,
-    zIndex:1,
-  },
-  EventContainer: {
-    backgroundColor: '#FFFFFF',
-    alignContent: 'space-around',
-    zIndex: 1,
-  },
-  textContainer: {
-    padding: 10,
-  },
-  eventName: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  eventDetails: {
-    fontSize: 14,
   },
   loadingText: {
     marginTop: 20,

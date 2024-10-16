@@ -31,6 +31,8 @@ import CustomRadioButton from "../../components/CustomRadioButton";
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faChevronDown } from "@fortawesome/free-solid-svg-icons/faChevronDown";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Ionicons from "@expo/vector-icons/Ionicons";
+
 
 
 interface UserData {
@@ -332,15 +334,11 @@ export default function Homepage(): JSX.Element {
               ))}
               <Pressable
               onPress={() => {
-                router.push('./InviteMember');
+                router.push("./InviteMember");
               }}
-              >
-              <Image
-                  key={"add_member"}
-                  source={require('@/assets/images/add_family_icon.png')}
-                  style={styles.addfamilyIcon}
-                  resizeMode="cover" />
-                  </Pressable>
+            >
+              <Ionicons name="add-circle-outline" size={50} color="#5081FF" />
+            </Pressable>
             </View>
             </>
       ) : (

@@ -90,13 +90,13 @@ export default function UploadtoGallery(): JSX.Element {
         //deselect if already selected
         setSelectedFamilyMembers(selectedFamilyMembers.filter((id) => id !== memberId)); //keep only those IDs that are not equal to the memberId being passed in. so if the id is the same as the one being pressed => bye bye
       } else {
-        // Select the member
+        //select the member
         setSelectedFamilyMembers([...selectedFamilyMembers, memberId]); //add the id to selectedFamilyMembers
         console.log(memberId);
       }
     };
   
-    const pickImage = async () => {
+    const pickImage = async () => { //inspired by the code in https://docs.expo.dev/versions/latest/sdk/imagepicker/ 
       let result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images, //https://docs.expo.dev/versions/latest/sdk/imagepicker/ a way to only allow Image filetypes
         allowsEditing: true,
@@ -129,7 +129,7 @@ export default function UploadtoGallery(): JSX.Element {
           const data = await response.json();
           console.log(data[0].Photo == "Does not exist");
   
-          if (data[0].Photo !== "Does not exist") { //if it already exist(returns a photo_id), alert
+          if (data[0].Photo !== "Does not exist") { //if it already exist(returns a photo_id) => alert
             Alert.alert('Photo already exists for the selected users.');
             return;
           }

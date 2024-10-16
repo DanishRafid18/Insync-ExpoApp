@@ -4,6 +4,8 @@ import Background from '../Background';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons/faPlus";
 
 interface ImageItem {
   is_uploader: any;
@@ -37,7 +39,7 @@ export default function Gallery() {
     getUserId();
   }, []);
 
-  useFocusEffect(
+  useFocusEffect( //https://reactnavigation.org/docs/use-focus-effect/ run when screen is active (get pictures)
     useCallback(() => {
       const fetchImages = async () => {
         if (userId !== null) {
@@ -76,6 +78,20 @@ export default function Gallery() {
   return (
     <>
     <Background></Background>
+    <View style={styles.headerWrapper}>
+        <Pressable
+          onPress={() => {
+            router.back();
+          }}
+          style={styles.backButton}
+        >
+          <Image
+            style={styles.backIcon}
+            source={require('@/assets/images/BackIcon.png')}
+          />
+          <Text style={styles.backText}>Gallery</Text>
+        </Pressable>
+      </View>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.imageContainer}>
           {loading ? (
@@ -88,33 +104,35 @@ export default function Gallery() {
                   style={styles.image}
                   resizeMode="cover"
                 />
-                <Text style={styles.uploadDate}>
-                  Photo Last updated on:{'\n'}
-                  {item.upload_date}
-                </Text>
-                
-                <Pressable
-                style={({ pressed }) => [
-                  {
-                    backgroundColor: pressed ? 'rgb(210, 230, 255)' : '#5081FF',
-                    padding: 10,
-                    borderRadius: 5,
-                    marginTop: 20,
-                    alignSelf: 'flex-end'
-                  },
-                ]}
-              >
-          <Text
-            style={{
-              textAlign: 'center',
-              fontFamily: 'DMSansBold',
-              color: '#FFFFFF',
-              fontSize: 20,
-            }}
-          >
-            Edit
-          </Text>
-        </Pressable>
+                <View style = {{alignContent: 'flex-end'}}>
+                    <Text style={styles.uploadDate}>
+                      Photo Last updated on:{'\n'}
+                      {item.upload_date}
+                    </Text>
+                    
+                    <Pressable
+                    onPress={() => router.push({ pathname: './UpdateGallery', params: { photo_id: item.photo_id } })} // learned about params from https://stackoverflow.com/questions/76604270/passing-object-using-expo-router verified answer
+                    style={({ pressed }) => [
+                      {
+                        backgroundColor: pressed ? 'rgb(210, 230, 255)' : '#5081FF',
+                        padding: 10,
+                        borderRadius: 5,
+                        marginTop: 20,
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={{
+                        textAlign: 'center',
+                        fontFamily: 'DMSansBold',
+                        color: '#FFFFFF',
+                        fontSize: 20,
+                      }}
+                    >
+                      Edit
+                    </Text>
+                  </Pressable>
+                </View>
               </View>
             ))
           ) : (
@@ -128,9 +146,7 @@ export default function Gallery() {
         router.push("/drawer/UploadtoGallery");
       }}
        style={styles.addButton}>
-      <Image
-        source={require('@/assets/images/add_icon.png')}
-      />
+      <FontAwesomeIcon icon={faPlus} size={38} color="#fff"/>
     </TouchableOpacity>
     </>
   );
@@ -164,8 +180,7 @@ const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
     padding: 10,
-    paddingBottom: 30,
-    marginTop: 70,
+    paddingBottom: 200,
     backgroundColor: 'transparent',
   },
   imageContainer: {
@@ -173,7 +188,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   image: {
-    width: Dimensions.get('window').width / 2 - 20,
+    width: Dimensions.get('window').width / 2 - 20, //https://reactnative.dev/docs/dimensions
     height: 200,
     margin: 10,
     borderRadius: 10,
@@ -197,7 +212,7 @@ const styles = StyleSheet.create({
   },
   headerWrapper: {
     marginTop: 20,
-    marginBottom: 10,
+    marginBottom: "25%",
     alignItems: 'flex-start',
     paddingHorizontal: 20,
   },
