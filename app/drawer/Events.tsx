@@ -222,7 +222,11 @@ export default function Events(): JSX.Element {
                 />
               ) : (
                 <View>
-                  <Pressable style = {styles.UploadStoryBox}>
+                  <Pressable 
+                  onPress={() => {
+                    router.push({ pathname: './UploadStory', params: { event_id: event.event_id } });
+                  }}
+                  style = {styles.UploadStoryBox}>
                   <Text style = {{textAlign: 'center', top: "40%"}}>+ Add story</Text>
                   </Pressable>
                 </View>

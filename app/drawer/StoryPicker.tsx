@@ -1,5 +1,3 @@
-// ImagePickerPage.tsx
-
 import React from 'react';
 import {
   View,
@@ -40,6 +38,10 @@ export default function StoryPicker(): JSX.Element {
     }
   };
 
+  const resetForm = () => {
+    setImage(null);
+  };
+
   const handleNext = () => {
     router.push({
       pathname: './ConfirmPage',
@@ -59,6 +61,7 @@ export default function StoryPicker(): JSX.Element {
         <View style={styles.headerWrapper}>
           <Pressable
             onPress={() => {
+              resetForm();
               router.back();
             }}
             style={styles.backButton}

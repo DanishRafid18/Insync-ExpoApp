@@ -14,6 +14,7 @@ import {
   Pressable,
   Button,
   Switch,
+  Alert,
 } from "react-native";
 import Background from '../Background';
 import {Picker} from '@react-native-picker/picker';
@@ -43,7 +44,7 @@ interface UserData {
 const data = [
   { label: 'Chilling', value: 'Chilling' },
   { label: "Occupied", value: "Occupied" },
-  { label: 'Do not disturb', value: 'Do not disturb' }
+  { label: 'Do Not Disturb', value: 'Do Not Disturb' }
 ];
 
 export default function Homepage(): JSX.Element {
@@ -58,6 +59,8 @@ export default function Homepage(): JSX.Element {
   const EventImage = require('@/assets/images/HomepageEvent.jpg');
   const [userId, setUserId] = useState<string | null>(null);
   const [familyIcons, setFamilyIcons] = useState<string[]>([]);
+  const [updatingStatus, setUpdatingStatus] = useState<boolean>(false); //state for status update
+
 
   const router = useRouter();
 
@@ -118,7 +121,8 @@ export default function Homepage(): JSX.Element {
           }
   
           const data = await response.json();
-          console.log('Fetched data:', data);
+          console.log('Fetched data:', data[0]);
+          setSelectedText(data[0].status) //set the status from the database
   
           if (Array.isArray(data) && data.length > 0) {
             setUserData(data[0]);
@@ -157,15 +161,60 @@ export default function Homepage(): JSX.Element {
     fetchUserData();
   }, [userId]);
 
-  const handleRadioPress = (value: string) => {
-    setRadioValue(value);
-    setSelectedText(value);
-    console.log("Selected Radio Value:", value);
-  };
+    //function to handle status update with PUT request
+    const updateStatus = async (newStatus: string) => {
+      if (!userId) {
+        Alert.alert('Error', 'User ID is missing.');
+        return;
+      }
+  
+      setUpdatingStatus(true); //loading
+  
+      try {
+        const response = await fetch('https://deco3801-foundjesse.uqcloud.net/restapi/api.php', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user_id: userId,
+            status: newStatus,
+          }),
+        });
+  
+        const data = await response.json();
+  
+        if (response.ok) {
+          Alert.alert('Success', 'Status updated successfully.');
+          setRadioValue(newStatus);
+          setSelectedText(newStatus);
+          if (userData) {
+            setUserData({ ...userData, status: newStatus });
+          }
+        } else {
+          console.error('PUT error:', data);
+          Alert.alert('Error', data.message || 'Failed to update status.');
+        }
+      } catch (error) {
+        console.error('Update Status Error:', error);
+        Alert.alert('Error', 'An error occurred while updating status.');
+      } finally {
+        setUpdatingStatus(false);
+      }
+    };
+
+    const handleRadioPress = (value: string) => {
+      setRadioValue(value);
+      setSelectedText(value);
+      console.log("Selected Radio Value:", value);
+      updateStatus(value); //call the updateStatus function
+      handleClosePress();
+    };
+
   const statusColors: { [key: string]: string } = {
     Chilling: "#33FD2F", // Green
     Occupied: "#FFC250", // Yellow
-    "Do not disturb": "#FF5050", // Red
+    "Do Not Disturb": "#FF5050", // Red
     "Auto Status": "#7300FF"
   };
 
@@ -235,11 +284,11 @@ export default function Homepage(): JSX.Element {
             <View style={styles.main}>
               <View style={styles.round2}></View>
               <CustomRadioButton
-                label="Do not disturb"
-                selected={radioValue === "Do not disturb"}
+                label="Do Not Disturb"
+                selected={radioValue === "Do Not Disturb"}
                 onPress={() => {
                   if (!isDisabled) {
-                    handleRadioPress("Do not disturb");
+                    handleRadioPress("Do Not Disturb");
                     handleClosePress();
                   }
                 }} //+

@@ -254,7 +254,6 @@ export default function CreateEvent(): JSX.Element {
 };
 
 const styles = StyleSheet.create({
-  // ... [same styles as before, but remove image picker and submit button styles]
   keyboardAvoidingView: {
     flex: 1,
     marginTop: 50,

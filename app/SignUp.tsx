@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { BlueTitleText } from '@/components/BlueTitleText';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 export default function SignUpScreen(){
@@ -26,7 +27,6 @@ export default function SignUpScreen(){
     const TextColor = colorScheme === 'dark' ? '#dce1e8' : '#B3B9C2';
 
     const handleSignUp = async () => {
-      // router.replace('/UploadPhoto');
       if (password !== confirmPassword) {
         Alert.alert('Error', 'Passwords do not match');
         return;
@@ -39,24 +39,29 @@ export default function SignUpScreen(){
         formData.append('email', email);
         formData.append('password', password);
   
-
         const response = await fetch('https://deco3801-foundjesse.uqcloud.net/restapi/api.php', {
           method: 'POST',
-          body: formData, //use FormData as the body
+          body: formData, //use FormData as the body like usual
           headers: {
-            'Content-Type': 'multipart/form-data', //the content type for FormData
+            'Content-Type': 'multipart/form-data', 
           },
         });
   
-        const data = await response.json();
+        const data = await response.json(); //the POST response will include a newly created user_id
   
         if (response.ok) {
+          //save user_id to AsyncStorage, instead of params im trying something
+          if (data.user_id) {
+            await AsyncStorage.setItem('user_id', data.user_id);
+          }
+  
           Alert.alert('Success', 'Account created successfully');
-          router.replace('/UploadPhoto');  //continue to upload photo
+          router.replace('/UploadPhoto'); //continue to upload photo
         } else {
           Alert.alert('Error', data.message || 'Something went wrong');
         }
       } catch (error) {
+        console.error('Sign Up Error:', error);
         Alert.alert('Error', 'Unable to sign up. Please try again later.');
       }
     };
