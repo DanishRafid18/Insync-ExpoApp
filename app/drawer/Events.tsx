@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -9,13 +9,14 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-} from 'react-native';
-import { useRouter } from 'expo-router';
-import Background from '../Background';
-import { useFocusEffect } from '@react-navigation/native'; //https://reactnavigation.org/docs/use-focus-effect/
-import AsyncStorage from '@react-native-async-storage/async-storage'; //https://react-native-async-storage.github.io/async-storage/docs/usage/
-
-
+} from "react-native";
+import { useRouter } from "expo-router";
+import Background from "../Background";
+import { useFocusEffect } from "@react-navigation/native"; //https://reactnavigation.org/docs/use-focus-effect/
+import AsyncStorage from "@react-native-async-storage/async-storage"; //https://react-native-async-storage.github.io/async-storage/docs/usage/
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
+import { faPlus } from "@fortawesome/free-solid-svg-icons/faPlus";
 interface EventData {
   event_id: number;
   event_name: string;
@@ -33,22 +34,22 @@ export default function Events(): JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
   const colorScheme = useColorScheme();
   const router = useRouter();
-  const TextColor = colorScheme === 'dark' ? '#000000' : '#000000';
+  const TextColor = colorScheme === "dark" ? "#000000" : "#000000";
   const [userId, setUserId] = useState<string | null>(null);
 
-   //fetch userId from AsyncStorage
-   useEffect(() => {
+  //fetch userId from AsyncStorage
+  useEffect(() => {
     const getUserId = async () => {
       try {
-        const id = await AsyncStorage.getItem('user_id');
+        const id = await AsyncStorage.getItem("user_id");
         if (id !== null) {
           setUserId(id);
         } else {
-          console.error('No user_id found in AsyncStorage');
+          console.error("No user_id found in AsyncStorage");
           setLoading(false); //stop loading if user_id is not found
         }
       } catch (error) {
-        console.error('Error retrieving user_id:', error);
+        console.error("Error retrieving user_id:", error);
         setLoading(false);
       }
     };
@@ -67,7 +68,7 @@ export default function Events(): JSX.Element {
               `https://deco3801-foundjesse.uqcloud.net/restapi/event.php?user=${userId}`
             );
             if (!response.ok) {
-              console.error('HTTP error:', response.status);
+              console.error("HTTP error:", response.status);
               setLoading(false);
               return;
             }
@@ -84,13 +85,13 @@ export default function Events(): JSX.Element {
 
               //remove duplicate events based on event_id
               const uniqueEvents = removeDuplicateEvents(upcomingEvents);
-              console.log('Fetched events:', uniqueEvents);
+              console.log("Fetched events:", uniqueEvents);
               setEvents(uniqueEvents);
             } else {
-              console.error('Invalid data format:', data);
+              console.error("Invalid data format:", data);
             }
           } catch (error) {
-            console.error('Fetch error:', error);
+            console.error("Fetch error:", error);
           } finally {
             setLoading(false);
           }
@@ -100,11 +101,11 @@ export default function Events(): JSX.Element {
     }, [userId]) //whenever userId changes, useCallback will recreate the callback function. (run it back)
   );
 
-
   const removeDuplicateEvents = (events: EventData[]): EventData[] => {
     const uniqueEventMap = new Map<number, EventData>();
     events.forEach((event) => {
-      if (!uniqueEventMap.has(event.event_id)) { //for each event check if the same id already exist in the uniqueEventMap
+      if (!uniqueEventMap.has(event.event_id)) {
+        //for each event check if the same id already exist in the uniqueEventMap
         uniqueEventMap.set(event.event_id, event);
       }
     });
@@ -130,35 +131,42 @@ export default function Events(): JSX.Element {
       { cancelable: true }
     );
   };
-  
 
   const deleteEvent = async (eventId: number) => {
     try {
-      const response = await fetch(`https://deco3801-foundjesse.uqcloud.net/restapi/event.php`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ event_id: eventId }),
-      });
-  
+      const response = await fetch(
+        `https://deco3801-foundjesse.uqcloud.net/restapi/event.php`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ event_id: eventId }),
+        }
+      );
+
       if (response.ok) {
         Alert.alert("Success", "Event deleted successfully!");
         //remove the deleted event from the state
-        setEvents((prevEvents) => prevEvents.filter((event) => event.event_id !== eventId)); //get the previous events(prevEvents) then filter it without the eventId thats being deleted
+        setEvents((prevEvents) =>
+          prevEvents.filter((event) => event.event_id !== eventId)
+        ); //get the previous events(prevEvents) then filter it without the eventId thats being deleted
       } else {
         const errorData = await response.json();
-        console.error('Delete error:', errorData);
-        Alert.alert("Error", errorData.message || "Failed to delete the event.");
+        console.error("Delete error:", errorData);
+        Alert.alert(
+          "Error",
+          errorData.message || "Failed to delete the event."
+        );
       }
     } catch (error) {
-      console.error('Network error:', error);
+      console.error("Network error:", error);
       Alert.alert("Error", "An error occurred while deleting the event.");
     }
   };
 
   return (
-    <View  style={styles.container }>
+    <View style={styles.container}>
       <Background />
       <View style={styles.headerWrapper}>
         <Pressable
@@ -167,13 +175,9 @@ export default function Events(): JSX.Element {
           }}
           style={styles.backButton}
         >
-          <Image
-            style={styles.backIcon}
-            source={require('@/assets/images/BackIcon.png')}
-          />
+          <Ionicons name="arrow-back-outline" size={24} color="white" />
           <Text style={styles.backText}>Events</Text>
         </Pressable>
-        
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -187,70 +191,80 @@ export default function Events(): JSX.Element {
                 styles.EventContainer,
                 {
                   height: 150,
-                  width: '80%',
+                  width: "80%",
                   borderRadius: 10,
-                  overflow: 'hidden',
+                  overflow: "hidden",
                   marginTop: 20,
-                  alignSelf: 'center',
+                  alignSelf: "center",
                 },
               ]}
             >
-               <View style={styles.eventContent}>
-              
-              <View style={styles.textContainer}>
-                <Text style={[styles.eventName, { color: TextColor }]}>
-                  {event.event_name}
-                </Text>
-                <Text style={[styles.eventDetails, { color: TextColor }]}>
-                  Start: {event.start_time}
-                </Text>
-                <Text style={[styles.eventDetails, { color: TextColor }]}>
-                  End: {event.end_time}
-                </Text>
-                <Text style={[styles.eventDetails, { color: TextColor }]}>
-                  {event.location}
-                </Text>
-                <Text style={[styles.eventDetails, { color: TextColor }]}>
-                  {event.description}
-                </Text>
-              </View>
-              {event.story ? (
-                <Image
-                  source={{ uri: `https://deco3801-foundjesse.uqcloud.net/uploads/${event.story}` }}
-                  style={styles.eventImage}
-                  resizeMode="cover"
-                />
-              ) : (
-                <View>
-                  <Pressable 
-                  onPress={() => {
-                    router.push({ pathname: './UploadStory', params: { event_id: event.event_id } });
-                  }}
-                  style = {styles.UploadStoryBox}>
-                  <Text style = {{textAlign: 'center', top: "40%"}}>+ Add story</Text>
-                  </Pressable>
+              <View style={styles.eventContent}>
+                <View style={styles.textContainer}>
+                  <Text style={[styles.eventName, { color: TextColor }]}>
+                    {event.event_name}
+                  </Text>
+                  <Text style={[styles.eventDetails, { color: TextColor }]}>
+                    Start: {event.start_time}
+                  </Text>
+                  <Text style={[styles.eventDetails, { color: TextColor }]}>
+                    End: {event.end_time}
+                  </Text>
+                  <Text style={[styles.eventDetails, { color: TextColor }]}>
+                    {event.location}
+                  </Text>
+                  <Text style={[styles.eventDetails, { color: TextColor }]}>
+                    {event.description}
+                  </Text>
                 </View>
-              )}
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => {
-                  router.push({ pathname: './EditEvent', params: { event_id: event.event_id } });
-                }}
-              >
-                <Image
+                {event.story ? (
+                  <Image
+                    source={{
+                      uri: `https://deco3801-foundjesse.uqcloud.net/uploads/${event.story}`,
+                    }}
+                    style={styles.eventImage}
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View>
+                    <Pressable
+                      onPress={() => {
+                        router.push({
+                          pathname: "./UploadStory",
+                          params: { event_id: event.event_id },
+                        });
+                      }}
+                      style={styles.UploadStoryBox}
+                    >
+                      <Text style={{ textAlign: "center", top: "40%" }}>
+                        + Add story
+                      </Text>
+                    </Pressable>
+                  </View>
+                )}
+                <TouchableOpacity
+                  style={styles.editButton}
+                  onPress={() => {
+                    router.push({
+                      pathname: "./EditEvent",
+                      params: { event_id: event.event_id },
+                    });
+                  }}
+                >
+                  <Image
+                    style={styles.deleteButton}
+                    source={require("@/assets/images/editIcon.png")}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity
                   style={styles.deleteButton}
-                  source={require('@/assets/images/editIcon.png')}
-                />
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.deleteButton}
-                onPress={() => handleDelete(event.event_id)}
-              >
-                <Image
-                  style={styles.deleteButton}
-                  source={require('@/assets/images/deleteIcon.png')}
-                />
-              </TouchableOpacity>
+                  onPress={() => handleDelete(event.event_id)}
+                >
+                  <Image
+                    style={styles.deleteButton}
+                    source={require("@/assets/images/deleteIcon.png")}
+                  />
+                </TouchableOpacity>
               </View>
             </Pressable>
           ))
@@ -259,14 +273,13 @@ export default function Events(): JSX.Element {
         )}
       </ScrollView>
       <TouchableOpacity
-      onPress={() => {
-        router.push("/drawer/CreateEvent");
-      }}
-       style={styles.addButton}>
-      <Image
-        source={require('@/assets/images/add_icon.png')}
-      />
-    </TouchableOpacity>
+        onPress={() => {
+          router.push("/drawer/CreateEvent");
+        }}
+        style={styles.addButton}
+      >
+        <FontAwesomeIcon icon={faPlus} size={38} color="#fff" />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -274,7 +287,7 @@ export default function Events(): JSX.Element {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    position: 'relative',
+    position: "relative",
   },
   UploadStoryBox: {
     marginRight: 10,
@@ -286,22 +299,22 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
-    alignItems: 'center',
+    alignItems: "center",
     paddingBottom: 20,
     marginTop: 20,
     zIndex: 1,
   },
   EventContainer: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     shadowOpacity: 0.1,
     shadowRadius: 5,
     elevation: 2,
-    position: 'relative',
+    position: "relative",
   },
   eventContent: {
-    flexDirection: 'row', 
-    padding: 10,
-    alignItems: 'center'
+    flexDirection: "row",
+    padding: 15,
+    alignItems: "center",
   },
   eventImage: {
     width: 100,
@@ -312,72 +325,72 @@ const styles = StyleSheet.create({
   eventImagePlaceholder: {
     width: 100,
     height: 100,
-    backgroundColor: '#E0E0E0',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#E0E0E0",
+    justifyContent: "center",
+    alignItems: "center",
     borderRadius: 10,
     marginRight: 10,
   },
   textContainer: {
     flex: 1,
-    justifyContent: 'space-between', 
+    justifyContent: "space-between",
   },
   eventName: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   eventDetails: {
     fontSize: 14,
     marginTop: 2,
   },
   deleteButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     right: 10,
     width: 36,
     height: 36,
   },
   editButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 50,
     right: 75,
     width: 36,
     height: 36,
   },
   addButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 30,
     right: 30,
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#5081FF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
+    backgroundColor: "#5081FF",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     zIndex: 2,
   },
   headerWrapper: {
-    position: 'static',
+    position: "static",
     zIndex: 1,
   },
   backButton: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginLeft: 20,
     marginTop: 40,
-    alignItems: 'center',
+    alignItems: "center",
   },
   backIcon: {
     width: 24,
     height: 24,
-    resizeMode: 'contain',
+    resizeMode: "contain",
   },
   backText: {
-    color: '#EFF3FF',
-    fontWeight: 'bold',
+    color: "#EFF3FF",
+    fontWeight: "bold",
     fontSize: 25,
     marginLeft: 10,
   },
