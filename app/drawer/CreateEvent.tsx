@@ -19,6 +19,7 @@ import Background from '../Background';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export default function CreateEvent(): JSX.Element {
   const router = useRouter();
@@ -117,10 +118,7 @@ export default function CreateEvent(): JSX.Element {
         }}
         style={styles.backButton}
       >
-        <Image
-          style={styles.backIcon}
-          source={require('@/assets/images/BackIcon.png')}
-        />
+<Ionicons name="arrow-back-outline" size={24} color="white" />
         <Text style={styles.backText}>Create Event</Text>
       </Pressable>
       <Image

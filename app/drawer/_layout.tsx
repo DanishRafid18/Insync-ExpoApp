@@ -28,7 +28,7 @@ function CustomDrawerContent(props: any) {
   return (
     <View style={{flex:1}}>
       <View style={{ height: 212,backgroundColor:"#5081FF", marginBottom: -40, flexDirection: 'row', alignItems: "center", justifyContent:"center"}}>
-        <Image source={require("../../assets/images/BlackTransparentLogo.png")} style={{width: '80%', height:"40%",resizeMode: 'stretch', marginTop: 20, marginRight: 20}}></Image>
+        <Image source={require("../../assets/images/Logo.png")} style={{width: '80%', height:"40%",resizeMode: 'stretch', marginTop: 20, marginRight: 20}}></Image>
       </View>
       <DrawerContentScrollView {...props}>
         <DrawerItemList {...props} />
