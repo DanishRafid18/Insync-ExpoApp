@@ -582,7 +582,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginTop: "35%",
-    width: 400,
+    width: 370,
     zIndex: -1,
     backgroundColor: "#FFFFFF",
     alignSelf: 'flex-end',

@@ -11,7 +11,7 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import Background from '../Background';
 import * as ImagePicker from 'expo-image-picker';
 import { ImagePickerAsset } from 'expo-image-picker';
-
+import Ionicons from "@expo/vector-icons/Ionicons";
 export default function StoryPicker(): JSX.Element {
   const router = useRouter();
   const params = useLocalSearchParams();
@@ -66,10 +66,7 @@ export default function StoryPicker(): JSX.Element {
             }}
             style={styles.backButton}
           >
-            <Image
-              style={styles.backIcon}
-              source={require('@/assets/images/BackIcon.png')}
-            />
+<Ionicons name="arrow-back-outline" size={24} color="white" />
             <Text style={styles.backText}>Select Image</Text>
           </Pressable>
           <Image
