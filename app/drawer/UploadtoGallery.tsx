@@ -8,10 +8,13 @@ import {
   ScrollView,
   Button,
   TouchableOpacity,
+  Pressable,
 } from 'react-native';
 import Background from '../Background';
 import * as ImagePicker from 'expo-image-picker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 export default function UploadtoGallery(): JSX.Element {
     const [image, setImage] = useState<string | null>(null);
@@ -200,6 +203,17 @@ export default function UploadtoGallery(): JSX.Element {
     return (
       <>
         <Background />
+        <View style={styles.headerWrapper}>
+        <Pressable
+          onPress={() => {
+            router.push("/drawer/Gallery");
+          }}
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back-outline" size={24} color="white" />
+          <Text style={styles.backText}>Back</Text>
+        </Pressable>
+      </View>
         <ScrollView contentContainerStyle={styles.container}>
           <Button title="Pick an image from camera roll" onPress={pickImage} />
           {image && <Image source={{ uri: image }} style={styles.image} />}
@@ -286,5 +300,21 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     textAlign: 'center',
     fontSize: 18,
+  },
+  headerWrapper: {
+    marginTop: 70,
+    marginBottom: 10,
+    alignItems: 'flex-start',
+    paddingHorizontal: 20,
+  },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  backText: {
+    color: '#EFF3FF',
+    fontWeight: 'bold',
+    fontSize: 25,
+    marginLeft: 10,
   },
 });

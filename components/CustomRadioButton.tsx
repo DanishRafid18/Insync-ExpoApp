@@ -9,7 +9,8 @@ interface CustomRadioButtonProps {
   isEnabled: boolean; 
 }
 
-const CustomRadioButton: React.FC<CustomRadioButtonProps> = ({ label, selected, onPress, style, isEnabled }) => {
+//"a radio button that i made because they dont have a library for it" -Jason
+const CustomRadioButton: React.FC<CustomRadioButtonProps> = ({ label, selected, onPress, style, isEnabled }) => { //React.FC is a way to make a custom components
   return (
     <TouchableOpacity 
       style={[styles.radioButton, style]} 

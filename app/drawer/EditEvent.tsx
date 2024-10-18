@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import Background from '../Background';
+import Ionicons from "@expo/vector-icons/Ionicons";
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as ImagePicker from 'expo-image-picker';
 import { ImagePickerAsset } from 'expo-image-picker';
@@ -170,14 +171,11 @@ const EditEvent = () => {
         }}
         style={styles.backButton}
       >
-        <Image
-          style={styles.backIcon}
-          source={require('@/assets/images/BackIcon.png')}
-        />
+<Ionicons name="arrow-back-outline" size={24} color="white" />
         <Text style={styles.backText}>Edit Event</Text>
       </Pressable>
     </View>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <TouchableWithoutFeedback>
         <ScrollView contentContainerStyle={styles.form}>
 
           {/* Event Name */}
@@ -263,6 +261,7 @@ const EditEvent = () => {
                 labelField="label"
                 valueField="value"
                 placeholder="Select Privacy"
+                dropdownPosition='top'
                 value={privacy}
                 onChange={(item) => {
                   setPrivacy(item.value);
@@ -281,6 +280,7 @@ const EditEvent = () => {
                 labelField="label"
                 valueField="value"
                 placeholder="Select Repeat"
+                dropdownPosition='top'
                 value={repeatEvent}
                 onChange={(item) => {
                   setRepeatEvent(item.value);

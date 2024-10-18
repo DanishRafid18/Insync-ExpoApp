@@ -22,10 +22,11 @@ import {View, Image} from 'react-native';
 import { useSafeAreaFrame, useSafeAreaInsets } from "react-native-safe-area-context";
 import { styles } from '@gorhom/bottom-sheet/lib/typescript/components/bottomSheetScrollable/BottomSheetFlashList';
 
+
 function CustomDrawerContent(props: any) {
   const router = useRouter();
   const {top, bottom} = useSafeAreaInsets();
-  return (
+  return ( //custom drawer made by Jason, inspired from https://youtu.be/3p9LtOUg5fw?si=QXoC2Mqnzu1ZXRzY
     <View style={{flex:1}}>
       <View style={{ height: 212,backgroundColor:"#5081FF", marginBottom: -40, flexDirection: 'row', alignItems: "center", justifyContent:"center"}}>
         <Image source={require("../../assets/images/Logo.png")} style={{width: '80%', height:"40%",resizeMode: 'stretch', marginTop: 20, marginRight: 20}}></Image>
@@ -38,9 +39,7 @@ function CustomDrawerContent(props: any) {
       <View style={{padding: 10, paddingBottom: 20 +bottom}}>
         <DrawerItem label={"Logout"} onPress={() => router.replace("/Login")} icon={({color}) => <MaterialCommunityIcons name="logout" size={34} color= {color} />}labelStyle={{ fontSize: 18 }} />
       </View>
-    </View>
-
- 
+    </View> 
   );
 }
 export default function DrawerLayout() {

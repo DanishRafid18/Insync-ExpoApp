@@ -103,6 +103,19 @@ export default function InviteMember() {
             </Text>
           </Pressable>
         </View>
+        <View style={{ flexDirection: 'row', alignSelf: 'center', position: 'absolute', bottom: 0, marginBottom: '20%' }}>
+          <Pressable
+            onPress={() => {
+              router.back();
+            }}
+          >
+            {({ pressed }) => (
+              <Text style={{ fontFamily: 'DMSansBold', color: pressed ? '#88a9fc' : '#5081FF', fontSize: 30}}>
+                {pressed ? 'Back' : 'Back'}
+              </Text>
+            )}
+          </Pressable>
+        </View>
       </SafeAreaView>
     );
   }

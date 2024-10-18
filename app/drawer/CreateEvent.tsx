@@ -104,30 +104,31 @@ export default function CreateEvent(): JSX.Element {
   };
 
   return (
-    
-    <><Background /><KeyboardAvoidingView
+
+    <><Background />
+    <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.keyboardAvoidingView}
     >
       {/* Header */}
       <View style={styles.headerWrapper}>
-      <Pressable
-        onPress={() => {
-          resetForm();
-          router.push("/drawer/Events");
-        }}
-        style={styles.backButton}
-      >
-<Ionicons name="arrow-back-outline" size={24} color="white" />
-        <Text style={styles.backText}>Create Event</Text>
-      </Pressable>
-      <Image
-          style = {{width: 400, height: 70, resizeMode: 'contain', marginTop: 50}}
+        <Pressable
+          onPress={() => {
+            resetForm();
+            router.push("/drawer/Events");
+          }}
+          style={styles.backButton}
+        >
+          <Ionicons name="arrow-back-outline" size={24} color="white" />
+          <Text style={styles.backText}>Create Event</Text>
+        </Pressable>
+        <Image
+          style={{ width: 400, height: 70, resizeMode: 'contain', marginTop: 50 }}
           source={require('@/assets/images/progress_detail.png')}
         />
-    </View>
-        
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      </View>
+
+      <TouchableWithoutFeedback style = {{flex: 1}}>
         <ScrollView contentContainerStyle={styles.form}>
           {/* Event Name */}
           <Text style={styles.formText}>Event Name:</Text>
@@ -154,7 +155,7 @@ export default function CreateEvent(): JSX.Element {
               if (selectedDate) {
                 setStartDateTime(selectedDate);
               }
-            } } />
+            }} />
 
           {/* End Time */}
           <Text style={styles.formText}>End Time:</Text>
@@ -166,7 +167,7 @@ export default function CreateEvent(): JSX.Element {
               if (selectedDate) {
                 setEndDateTime(selectedDate);
               }
-            } } />
+            }} />
 
           {/* Location */}
           <Text style={styles.formText}>Location:</Text>
@@ -212,10 +213,11 @@ export default function CreateEvent(): JSX.Element {
                 labelField="label"
                 valueField="value"
                 placeholder="Select Privacy"
+                dropdownPosition='top'
                 value={privacy}
                 onChange={(item) => {
                   setPrivacy(item.value);
-                } }
+                }}
                 selectedTextStyle={{ color: colorScheme === 'dark' ? '#FFFFFF' : '#000000' }}
                 containerStyle={{ backgroundColor: TextFieldColor }}
                 placeholderStyle={{ color: TextColor }} />
@@ -230,23 +232,24 @@ export default function CreateEvent(): JSX.Element {
                 labelField="label"
                 valueField="value"
                 placeholder="Select Repeat"
+                dropdownPosition='top'
                 value={repeatEvent}
                 onChange={(item) => {
                   setRepeatEvent(item.value);
-                } }
+                }}
                 selectedTextStyle={{ color: colorScheme === 'dark' ? '#FFFFFF' : '#000000' }}
                 containerStyle={{ backgroundColor: TextFieldColor }}
                 placeholderStyle={{ color: TextColor }} />
             </View>
           </View>
 
-            {/* Next Button */}
-            <Pressable style={styles.nextButton} onPress={handleNext}>
-              <Text style={styles.nextButtonText}>Next</Text>
-            </Pressable>
-          </ScrollView>
-        </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
+          {/* Next Button */}
+          <Pressable style={styles.nextButton} onPress={handleNext}>
+            <Text style={styles.nextButtonText}>Next</Text>
+          </Pressable>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
     </>
   );
 };
